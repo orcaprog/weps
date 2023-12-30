@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:42:27 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/30 12:22:23 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/30 13:40:21 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ private:
     std::vector<std::string> server_name; 
     std::vector<std::string> host; 
     std::vector<std::string> root;
+    std::vector<std::string> index;
+    std::vector<long long int > client_max_body_size;
 public:
     std::vector<std::string> Vstrvalid;
     std::vector<std::vector<std::string> > servconf;

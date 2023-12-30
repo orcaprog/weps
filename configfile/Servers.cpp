@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/30 12:38:27 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/30 13:45:05 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int Servers::pathExists(std::string path) {
     struct stat fileStat;
-        std::cout<<"____error____\n"; 
     return stat(path.c_str(), &fileStat) == 0;
 }
 
@@ -67,7 +66,6 @@ int Servers::checkDup(std::string der,int & index)
         {
            throw "Error duplicate derective \n";
         }
-        
     }
     return (dup);
 }
@@ -126,7 +124,6 @@ void Servers::SetHost()
     }
     arg = servconf[i][1];
     parceIp(arg);
-    
     host.push_back(arg);
 }
 void Servers::SetRoot()
@@ -148,6 +145,47 @@ void Servers::SetRoot()
         throw ("Path does not exist.\n");
     }
     root.push_back(arg);
+}
+void Servers::SetIndex()
+{
+    int i;
+    int num = checkDup("index",i);
+    std::string arg;
+    if (num == 0)
+    {
+        return ;
+    }
+    if (servconf[i].size() != 2 )
+    {
+         throw "invalid port in of the server_name directive \n";
+    }
+    arg = servconf[i][1];
+    if (!pathExists(arg)) 
+    {
+        throw ("Path does not exist.\n");
+    }
+    index.push_back(arg);
+}
+void Servers::SetClient_max_body_size()
+{
+    int i;
+    int num = checkDup("client_max_body_size",i);
+    std::string arg;
+    if (num == 0)
+    {
+        return ;
+    }
+    if (servconf[i].size() != 2 )
+    {
+         throw "invalid port in of the server_name directive \n";
+    }
+    arg = servconf[i][1];
+    long long int  myport = std::strtod(arg.c_str(),NULL);
+    if (!check_isdigit(arg))
+    {
+        throw  ("invalid port in of the  directive \n");
+    }   
+    client_max_body_size.push_back(myport);
 }
 void Servers::FillValid()
 {
