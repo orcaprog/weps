@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:36:57 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/29 17:59:00 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/30 11:46:20 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 int main(int ac , char **av)
 {
+    (void)ac;
     ParceConf server(av[1]);   
     // std::vector<std::vector<std::string>> matrix =  server.Vconf;
     
@@ -23,7 +24,16 @@ int main(int ac , char **av)
     //     }
     //     std::cout << std::endl;
     // }
-    server.desplay();
+    try
+    {
+        server.desplay();
+        
+    }
+    catch(const char * e)
+    {
+        std::cerr << e<< '\n';
+    }
+    
 
     
 }

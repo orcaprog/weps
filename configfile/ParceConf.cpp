@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:31 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/29 20:11:54 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/30 12:28:23 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ ParceConf::ParceConf(std::string confgfile)
 {
     std::ifstream configfile;
     std::string line;
-    configfile.open(confgfile);
+    configfile.open(confgfile.c_str(), std::ios::in);
     if (configfile.is_open()) 
     {
         while (getline(configfile, line)) {
@@ -67,7 +67,7 @@ void ParceConf::FillServers()
     
     std::vector<std::string> Vcol;
     std::vector<std::string>::iterator iter;
-    int x = 0;
+
     // if(Vconf[0][0] != "server")
     // {
     //     throw "Error : no server derectires";
@@ -87,12 +87,16 @@ void ParceConf::FillServers()
 void ParceConf::desplay()
 {
     FillServers();
-    int i = 0;
+    size_t i = 0;
     while (i < Vservers.size())
     {
         std::cout<<"_________________________"<<std::endl;
         Vservers[i].FillValid();
         Vservers[i].checkValidation();
+        Vservers[i].SetPorts ();
+        std::cout<<"here -------------\n";
+        Vservers[i].SetRoot ();
+        Vservers[i].SetHost ();
         Vservers[i].desplay();
         i++;
     }

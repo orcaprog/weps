@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:35 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/29 16:53:20 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/30 09:42:13 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,14 @@
 #include <vector>
 #include <deque>
 #include <map>
+
 class ParceConf
 {
 private:
-int index;
+size_t index;
 public:
     std::vector< Servers > Vservers;
-    std::vector<std::vector<std::string>>  Vconf;
+    std::vector<std::vector<std::string> >  Vconf;
     // std::vector<std::pair<int,std::vector<std::string>>>  Vconf;
     Servers FirstFill();
     std::vector<std::string> Split_line(std::string line);
