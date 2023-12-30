@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:36:57 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/30 11:46:20 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/30 20:27:38 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int main(int ac , char **av)
         server.desplay();
         
     }
-    catch(const char * e)
+    catch(std::string  e)
     {
         std::cerr << e<< '\n';
     }

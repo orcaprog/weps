@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/30 13:45:05 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/30 20:36:44 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,12 @@ void Servers::parceIp(std::string ip)
         net = std::atoi(line.c_str()) ;
         if (line.size() > 3 || !check_isdigit(line) || net > 255 || net < 0)
         {
-            throw "error invalid ip host1\n";
+            throw "error invalid ip host "+ip+" \n";
         }
         len++;
     }
     if (len != 4)
-        throw "error invalid ip host\n";
+        throw "error invalid ip host "+ip+" \n";
 
 }
 int Servers::checkDup(std::string der,int & index)
@@ -86,7 +86,7 @@ void Servers::SetPorts ()
     int myport = std::atoi(arg.c_str());
     if (!check_isdigit(arg)  || myport > 65535)
     {
-        throw  ("invalid port in " + arg + "of the  directive \n");
+        throw  ("invalid port in '" + arg + "' of the  directive \n");
     }
     port.push_back(myport);
 }
@@ -102,9 +102,11 @@ void Servers::SetServerName()
     }
     if (servconf[i].size() != 2 )
     {
-         throw "invalid port in of the server_name directive \n";
+         throw "invalid port  directive \n";
     }
     arg = servconf[i][1];
+
+    //check hna laykon chi check
     server_name.push_back(arg);
 }
 
@@ -120,7 +122,7 @@ void Servers::SetHost()
     }
     if (servconf[i].size() != 2 )
     {
-         throw "invalid port in of the server_name directive \n";
+         throw "invalid host in  directive \n";
     }
     arg = servconf[i][1];
     parceIp(arg);
@@ -137,12 +139,12 @@ void Servers::SetRoot()
     }
     if (servconf[i].size() != 2 )
     {
-         throw "invalid port in of the server_name directive \n";
+         throw "invalid root directive \n";
     }
     arg = servconf[i][1];
     if (!pathExists(arg)) 
     {
-        throw ("Path does not exist.\n");
+        throw ("Path '"+arg+"' does not exist.\n");
     }
     root.push_back(arg);
 }
@@ -162,7 +164,7 @@ void Servers::SetIndex()
     arg = servconf[i][1];
     if (!pathExists(arg)) 
     {
-        throw ("Path does not exist.\n");
+       throw ("Path '"+arg+"' does not exist.\n");
     }
     index.push_back(arg);
 }
@@ -177,15 +179,102 @@ void Servers::SetClient_max_body_size()
     }
     if (servconf[i].size() != 2 )
     {
-         throw "invalid port in of the server_name directive \n";
+         throw "invalid client_max_body_size  directive \n";
     }
     arg = servconf[i][1];
-    long long int  myport = std::strtod(arg.c_str(),NULL);
+    long long int  body_size = std::strtod(arg.c_str(),NULL);
     if (!check_isdigit(arg))
     {
-        throw  ("invalid port in of the  directive \n");
+        throw  "invalid port in '"+ arg +"' of the  directive \n";
     }   
-    client_max_body_size.push_back(myport);
+    client_max_body_size.push_back(body_size);
+}
+
+void Servers::check_Status(std::string status)
+{
+    std::vector<std::string>::iterator iter;
+
+    iter = std::find(s_erorr.begin(),s_erorr.end(),status);
+    if (iter == s_erorr.end())
+    {
+        throw "Error : Invalid status '"+status +"' code  Derecties\n";
+    }
+}
+std::vector<std::string>  Servers::AddErrorPage(std::string status,std::string path)
+{
+    std::vector<std::string> vErrorPage;
+    vErrorPage.push_back(status);
+    vErrorPage.push_back(path);
+
+    return vErrorPage;
+}
+void Servers::SetError_page()
+{
+    std::string status;
+    std::string path;
+    for (size_t i = 0; i < servconf.size(); i++)
+    {
+        if (servconf[i][0] == "error_page")
+        {
+            if (servconf[i].size() != 3)
+            {
+                throw "Error in error_page\n";
+            }
+            status = servconf[i][1];
+            path = servconf[i][2];
+            check_Status(status);
+            if (!pathExists(path)) 
+            {
+                throw ("Path '"+path+"' does not exist.\n");
+            }
+            error_page.push_back(AddErrorPage(status,path));
+        }
+    }
+    
+}
+void Servers::FillStatus()
+{
+    s_erorr.push_back("400");
+    s_erorr.push_back("401");
+    s_erorr.push_back("402");
+    s_erorr.push_back("403");
+    s_erorr.push_back("404");
+    s_erorr.push_back("405");
+    s_erorr.push_back("406");
+    s_erorr.push_back("407");
+    s_erorr.push_back("408");
+    s_erorr.push_back("409");
+    s_erorr.push_back("410");
+    s_erorr.push_back("411");
+    s_erorr.push_back("412");
+    s_erorr.push_back("413");
+    s_erorr.push_back("414");
+    s_erorr.push_back("415");
+    s_erorr.push_back("416");
+    s_erorr.push_back("417");
+    s_erorr.push_back("418");
+    s_erorr.push_back("421");
+    s_erorr.push_back("422");
+    s_erorr.push_back("423");
+    s_erorr.push_back("424");
+    s_erorr.push_back("425");
+    s_erorr.push_back("426");
+    s_erorr.push_back("428");
+    s_erorr.push_back("429");
+    s_erorr.push_back("431");
+    s_erorr.push_back("451");
+    s_erorr.push_back("500");
+    s_erorr.push_back("501");
+    s_erorr.push_back("502");
+    s_erorr.push_back("503");
+    s_erorr.push_back("504");
+    s_erorr.push_back("505");
+    s_erorr.push_back("506");
+    s_erorr.push_back("507");
+    s_erorr.push_back("508");
+    s_erorr.push_back("510");
+    s_erorr.push_back("511");
+
 }
 void Servers::FillValid()
 {

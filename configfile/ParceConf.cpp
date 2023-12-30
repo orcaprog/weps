@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:31 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/30 12:28:23 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/30 20:41:07 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,12 +91,17 @@ void ParceConf::desplay()
     while (i < Vservers.size())
     {
         std::cout<<"_________________________"<<std::endl;
-        Vservers[i].FillValid();
+        
+        Vservers[i].SetHost();
+        Vservers[i].SetRoot();
+        Vservers[i].SetPorts();
+        Vservers[i].SetIndex();
+        Vservers[i].FillValid();  
+        Vservers[i].FillStatus();
+        Vservers[i].SetServerName();
+        Vservers[i].SetError_page();
         Vservers[i].checkValidation();
-        Vservers[i].SetPorts ();
-        std::cout<<"here -------------\n";
-        Vservers[i].SetRoot ();
-        Vservers[i].SetHost ();
+        Vservers[i].SetClient_max_body_size();
         Vservers[i].desplay();
         i++;
     }
