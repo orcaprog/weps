@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/31 12:17:23 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/31 13:54:54 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,7 +304,7 @@ Location Servers::FirstFill(size_t & index)
     Location loaction;
     loaction.vlocation.push_back(servconf[index]);
     index++;
-    while (index < servconf.size() && servconf[index][0] != "loaction")
+    while (index < servconf.size() && servconf[index][0] != "location")
     {
         loaction.vlocation.push_back(servconf[index]);
         index++;
@@ -415,12 +415,13 @@ Print_dirs(GetPorts().begin(),GetPorts().end(),"Pots");
 Print_dirs(GetServerName().begin(),GetServerName().end(),"Server_name");
 Print_dirs(GetHost().begin(),GetHost().end(),"Host");
 Print_dirs(GetRoot().begin(),GetRoot().end(),"Root");
-// Printtwodom(GetError_page(),"Error_page");
-// Print_dirs(GetClient_max_body_size().begin(),GetClient_max_body_size().end(),"Client_max_body_size");
-// Print_dirs(GetIndex().begin(),GetIndex().end(),"Index");
+Printtwodom(GetError_page(),"Error_page");
+Print_dirs(GetClient_max_body_size().begin(),GetClient_max_body_size().end(),"Client_max_body_size");
+Print_dirs(GetIndex().begin(),GetIndex().end(),"Index");
 size_t i = 0;
 while (i < loactions.size())
 {
+    std::cout<<"________________________\n";
     loactions[i].desplay();
     i++;
 }
