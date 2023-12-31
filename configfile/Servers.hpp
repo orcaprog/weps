@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:42:27 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/31 12:09:02 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/31 17:44:36 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,11 @@ public:
     std::vector<Location> loactions;
     Location FirstFill(size_t & index);
     void FillLocation();
-    
-
 
     //________________________//
+  
+
+    
     std::vector<std::string>  AddErrorPage(std::string status,std::string path);
     void desplay();
     int  checkDup(std::string der,int & index);

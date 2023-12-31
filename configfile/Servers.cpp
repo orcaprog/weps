@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/31 13:54:54 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/31 18:46:18 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,6 +306,7 @@ Location Servers::FirstFill(size_t & index)
     index++;
     while (index < servconf.size() && servconf[index][0] != "location")
     {
+        // std::cout<<index<<"  :"<<servconf[index][0]<<std::endl;
         loaction.vlocation.push_back(servconf[index]);
         index++;
     }
@@ -411,7 +412,7 @@ void Servers::desplay()
     // std::vector<std::vector<std::string> > matrix = servconf;
     
 FillLocation();
-Print_dirs(GetPorts().begin(),GetPorts().end(),"Pots");
+Print_dirs(GetPorts().begin(),GetPorts().end(),"Ports");
 Print_dirs(GetServerName().begin(),GetServerName().end(),"Server_name");
 Print_dirs(GetHost().begin(),GetHost().end(),"Host");
 Print_dirs(GetRoot().begin(),GetRoot().end(),"Root");
@@ -422,7 +423,7 @@ size_t i = 0;
 while (i < loactions.size())
 {
     std::cout<<"________________________\n";
-    loactions[i].desplay();
+    loactions[i].desplayLocation();
     i++;
 }
    
