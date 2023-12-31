@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/30 20:36:44 by abouassi         ###   ########.fr       */
+/*   Updated: 2023/12/31 12:17:23 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,21 @@ bool Servers::check_isdigit(std::string str)
     return (1);
 }
 
+void Servers::Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data)
+{
+    for (std::vector<std::vector<std::string> >::const_iterator row = matrix.begin(); row != matrix.end(); ++row) {
+        std::cout<<data<<"   :";
+    for (std::vector<std::string>::const_iterator value = row->begin(); value != row->end(); ++value) {
+        std::cout << *value << "|";
+    }
+    std::cout << std::endl;
+}
+    
+}
+
+/*_____________________________________________________________*/
+/*_________________________SET_________________________________*/
+/*_____________________________________________________________*/
 
 void Servers::parceIp(std::string ip)
 {
@@ -55,7 +70,9 @@ void Servers::parceIp(std::string ip)
 int Servers::checkDup(std::string der,int & index)
 {
     int dup = 0;
-    for (size_t i = 0; i < servconf.size(); i++)
+    size_t i = 0;
+    std::cout << der <<"   :"<<GetIndex("location")<<std::endl;
+    while ( i < GetIndex("location"))
     {
         if (servconf[i][0] == der)
         {
@@ -66,6 +83,7 @@ int Servers::checkDup(std::string der,int & index)
         {
            throw "Error duplicate derective \n";
         }
+        i++;
     }
     return (dup);
 }
@@ -232,6 +250,85 @@ void Servers::SetError_page()
     }
     
 }
+
+
+/*_____________________________________________________________*/
+/*_________________________GET_________________________________*/
+/*_____________________________________________________________*/
+
+const std::vector<int> & Servers::GetPorts ()
+{
+    return port;
+}
+const std::vector<std::string> & Servers::GetServerName()
+{
+    return server_name ;
+} 
+const std::vector<std::string> & Servers::GetHost()
+{
+    return host;
+}
+const std::vector<std::string> & Servers::GetRoot()
+{
+    return root;
+}
+const std::vector<std::vector<std::string> >&  Servers::GetError_page()
+{
+    return error_page;
+}
+const std::vector<long long int > &  Servers::GetClient_max_body_size()
+{
+    return client_max_body_size;
+}
+const std::vector<std::string> & Servers::GetIndex()
+{
+    return index;
+}
+
+/*=======================================================================*/
+/*=======================================================================*/
+size_t Servers::GetIndex(std::string dir)
+{
+    size_t i ;
+    for (i = 0; i < servconf.size(); i++)
+    {
+        if (servconf[i][0] == dir)
+        {
+            return i;
+        }
+    }
+    return (i);
+}
+Location Servers::FirstFill(size_t & index)
+{
+    Location loaction;
+    loaction.vlocation.push_back(servconf[index]);
+    index++;
+    while (index < servconf.size() && servconf[index][0] != "loaction")
+    {
+        loaction.vlocation.push_back(servconf[index]);
+        index++;
+    }
+    return loaction;
+}
+
+
+void Servers::FillLocation()
+{
+    size_t index = GetIndex("location");
+
+    if (index == servconf.size())
+    {
+        return ;
+    }
+    while (index < servconf.size())
+    {
+        loactions.push_back(FirstFill(index));
+    }
+}
+/*=======================================================================*/
+/*=======================================================================*/
+
 void Servers::FillStatus()
 {
     s_erorr.push_back("400");
@@ -298,7 +395,7 @@ void Servers::FillValid()
 void Servers::checkValidation()
 {
     std::vector<std::string>::iterator iter;
-    for (size_t i = 0; i < servconf.size(); i++)
+    for (size_t i = 0; i < GetIndex("location"); i++)
     {
         iter = std::find(Vstrvalid.begin(),Vstrvalid.end(),servconf[i][0]);
         if (iter == Vstrvalid.end())
@@ -308,15 +405,26 @@ void Servers::checkValidation()
     }
     
 }
+
 void Servers::desplay()
 {
-    std::vector<std::vector<std::string> > matrix = servconf;
-    for (std::vector<std::vector<std::string> >::const_iterator row = matrix.begin(); row != matrix.end(); ++row) {
-        for (std::vector<std::string>::const_iterator value = row->begin(); value != row->end(); ++value) {
-            std::cout << *value << "|";
-        }
-        std::cout << std::endl;
-    }
+    // std::vector<std::vector<std::string> > matrix = servconf;
+    
+FillLocation();
+Print_dirs(GetPorts().begin(),GetPorts().end(),"Pots");
+Print_dirs(GetServerName().begin(),GetServerName().end(),"Server_name");
+Print_dirs(GetHost().begin(),GetHost().end(),"Host");
+Print_dirs(GetRoot().begin(),GetRoot().end(),"Root");
+// Printtwodom(GetError_page(),"Error_page");
+// Print_dirs(GetClient_max_body_size().begin(),GetClient_max_body_size().end(),"Client_max_body_size");
+// Print_dirs(GetIndex().begin(),GetIndex().end(),"Index");
+size_t i = 0;
+while (i < loactions.size())
+{
+    loactions[i].desplay();
+    i++;
+}
+   
 }
 
 Servers::Servers()

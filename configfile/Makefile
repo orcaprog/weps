@@ -1,6 +1,6 @@
 NAME = parce
 
-SRC = main.cpp  ParceConf.cpp Servers.cpp\
+SRC = main.cpp  ParceConf.cpp Servers.cpp Location.cpp\
 
 CXX = c++
 
