@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:36:57 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/31 10:10:28 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/01 09:34:21 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,10 @@ int main(int ac , char **av)
     {
         std::cerr << e<< '\n';
     }
-    
+        catch(const char * e)
+    {
+        std::cerr << e<< '\n';
+    }
 
     
 }

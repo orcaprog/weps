@@ -6,11 +6,67 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/31 18:46:18 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/01 20:04:22 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Servers.hpp"
+
+void Servers::ParceServers()
+{
+    std::vector<std::string> vec;
+    for (size_t i = 0; i < servconf.size(); i++)
+    {
+        if (servconf[i][0] == "server" || servconf[i][0] == "location" ||  servconf[i][0] == "}" ||  servconf[i][0] == "{" )
+        {
+            vec.push_back(servconf[i][0]);
+        }
+        
+    }
+    std::vector<std::string>::iterator iter;
+    std::vector<std::string>::iterator loc;
+    iter = vec.begin();
+    iter++;
+    if(iter != vec.end() && *iter != "{")
+    {
+         throw "error no open { for server \n";
+    }
+    iter++;
+    while (iter != vec.end())
+    {
+        if (*iter == "{")
+        {
+            throw "error no open\n";
+        }
+        
+        if (*iter == "}" && iter + 1 != vec.end())
+        {
+            throw "error no close here\n";
+        }
+        loc = std::find(iter,vec.end(),"location");
+        
+        if (loc != vec.end())
+        {
+            loc++;
+            if (loc != vec.end() && *loc !=  "{")
+            {
+                throw "error no open { for location\n";
+            }
+            loc++;
+            if (loc != vec.end() && *loc !=  "}")
+            {
+                throw "error no open } for location\n";
+            }
+            loc++;
+            if (loc == vec.end() || (*loc == "}" && loc + 1 != vec.end()))
+            {
+                throw "error for closeb\n";
+            }
+        }
+        iter = loc;
+    }
+}
+
 
 int Servers::pathExists(std::string path) {
     struct stat fileStat;
@@ -71,7 +127,6 @@ int Servers::checkDup(std::string der,int & index)
 {
     int dup = 0;
     size_t i = 0;
-    std::cout << der <<"   :"<<GetIndex("location")<<std::endl;
     while ( i < GetIndex("location"))
     {
         if (servconf[i][0] == der)
@@ -251,7 +306,31 @@ void Servers::SetError_page()
     
 }
 
-
+void Servers::SetAllDir()
+{
+    ParceServers();
+    FillValid();
+    FillStatus();
+    FillLocation();
+    checkValidation();
+    
+     
+    SetHost();
+    SetRoot();
+    SetPorts();
+    SetIndex();
+    SetServerName();
+    SetError_page();
+    SetClient_max_body_size();
+    
+    size_t i = 0;
+    while (i < loactions.size())
+    {
+        loactions[i].SetAllDir();
+        i++;
+    }
+    
+}
 /*_____________________________________________________________*/
 /*_________________________GET_________________________________*/
 /*_____________________________________________________________*/
@@ -411,7 +490,6 @@ void Servers::desplay()
 {
     // std::vector<std::vector<std::string> > matrix = servconf;
     
-FillLocation();
 Print_dirs(GetPorts().begin(),GetPorts().end(),"Ports");
 Print_dirs(GetServerName().begin(),GetServerName().end(),"Server_name");
 Print_dirs(GetHost().begin(),GetHost().end(),"Host");

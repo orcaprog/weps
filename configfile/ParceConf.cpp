@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:31 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/31 11:44:02 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/01 18:45:07 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,20 @@ ParceConf::ParceConf(std::string confgfile)
 {
     std::ifstream configfile;
     std::string line;
+    std::vector<std::string> _split;
     configfile.open(confgfile.c_str(), std::ios::in);
     if (configfile.is_open()) 
     {
         while (getline(configfile, line)) {
-            if (!line.empty())
+            
+            if (!line.empty() )
             {
-                Vconf.push_back(Split_line(line));
+                _split = Split_line(line);
+                if (!_split.empty())
+                {
+                    Vconf.push_back(_split);
+                }
+                
             }
         }
         configfile.close();
@@ -47,6 +54,7 @@ ParceConf::ParceConf(std::string confgfile)
 Servers ParceConf::FirstFill()
 {
     Servers server;
+    // int bracket = 0;
     if (Vconf[index][0] != "server" || Vconf[index].size() > 1)
     {
         throw "Error : no server derectires";
@@ -54,11 +62,28 @@ Servers ParceConf::FirstFill()
     else
         server.servconf.push_back(Vconf[index]);
     index++;
+    
+    // if (index < Vconf.size()  && Vconf[index][0] != "{")
+    // {
+    //     throw "Error : no open brackets \n";
+    // }
+    // index++;
+    // bracket++;
+    
     while (index < Vconf.size() && Vconf[index][0] != "server")
     {
+        // if (Vconf[index][0] == "{")
+        //     bracket++;
+
         server.servconf.push_back(Vconf[index]);
         index++;
     }
+    // std::cout<<"_______br______"<<bracket<<std::endl;
+    // if (Vconf[index - 1][0] != "}")
+    // {
+    //     throw "Error : no open brackets \n";
+    // }
+    
     return server;
 }
 void ParceConf::FillServers()
@@ -90,19 +115,11 @@ void ParceConf::desplay()
     size_t i = 0;
     while (i < Vservers.size())
     {
-        std::cout<<"_________________________"<<std::endl;
+        std::cout<<"###############################"<<std::endl;
         
-        Vservers[i].SetHost();
-        Vservers[i].SetRoot();
-        Vservers[i].SetPorts();
-        Vservers[i].SetIndex();
-        Vservers[i].FillValid();  
-        Vservers[i].FillStatus();
-        Vservers[i].SetServerName();
-        Vservers[i].SetError_page();
-        Vservers[i].checkValidation();
-        Vservers[i].SetClient_max_body_size();
+        Vservers[i].SetAllDir();
         Vservers[i].desplay();
+        std::cout<<"###############################"<<std::endl;
         i++;
     }
     // std::vector<std::vector<std::string>> matrix =  Vservers[0].vconf;

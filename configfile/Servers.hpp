@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:42:27 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/31 17:44:36 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/01 18:26:00 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <map>
 #include <sys/stat.h>
 #include "Location.hpp"
+#include <stack>
 class Servers
 {
 private:
@@ -34,24 +35,9 @@ private:
     std::vector<long long int > client_max_body_size;
     std::vector<std::vector<std::string> > error_page;
     std::vector<std::string> s_erorr;
-    
-public:
-    std::vector<std::string> Vstrvalid;
-    std::vector<std::vector<std::string> > servconf;
-    size_t GetIndex(std::string dir);
-    //________________________//
-    //________loaction________//
-    
-    std::vector<Location> loactions;
-    Location FirstFill(size_t & index);
-    void FillLocation();
 
-    //________________________//
-  
 
-    
     std::vector<std::string>  AddErrorPage(std::string status,std::string path);
-    void desplay();
     int  checkDup(std::string der,int & index);
     bool check_isdigit(std::string str);
     void FillStatus();
@@ -60,6 +46,12 @@ public:
     void parceIp(std::string ip);
     int  pathExists(std::string path);
     void check_Status(std::string status);
+
+    
+    size_t GetIndex(std::string dir);
+    
+    Location FirstFill(size_t & index);
+    void FillLocation();
     
     void SetPorts (); // done ~
     void SetServerName(); // done ~
@@ -69,6 +61,21 @@ public:
     void SetClient_max_body_size(); // done ~
     void SetIndex(); // done ~
     
+    void ParceServers();    
+    
+    void Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data);
+public:
+    std::vector<std::string> Vstrvalid;
+    std::vector<std::vector<std::string> > servconf;
+    //________________________//
+    //________loaction________//
+    
+    std::vector<Location> loactions;
+
+    //________________________//
+    void SetAllDir();
+    void desplay();
+    
     const std::vector<int> & GetPorts (); 
     const std::vector<std::string> & GetServerName(); 
     const std::vector<std::string> & GetHost();  
@@ -76,10 +83,6 @@ public:
     const std::vector<std::vector<std::string> >&  GetError_page(); 
     const std::vector<long long int > &  GetClient_max_body_size(); 
     const std::vector<std::string> & GetIndex(); 
-    
-    
-    void Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data);
-
     template<typename T,typename V>
     void Print_dirs(T begin,T end,V data)
     {
@@ -89,8 +92,6 @@ public:
             begin++;
         }
     }
-
-
 
     Servers();
     ~Servers();

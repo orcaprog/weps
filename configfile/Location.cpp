@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:03 by abouassi          #+#    #+#             */
-/*   Updated: 2023/12/31 18:57:41 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/01 11:35:29 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,7 @@ void Location::checkValidation()
             throw "Error : Invalid Derecties\n";
         }
     }
-    
 }
-
-
 
 int Location::pathExists(std::string path) {
     struct stat fileStat;
@@ -85,8 +82,20 @@ int Location::checkDup(std::string der,int & index)
 }
 void Location::desplayLocation()
 {
+
+    // Printtwodom(vlocation,"location");
+    Print_dirs(GetPath().begin(),GetPath().end(),"Path");
+    Print_dirs(GetAllowMethods().begin(),GetAllowMethods().end(),"AllowMethods");
+    Print_dirs(GetRoot().begin(),GetRoot().end(),"Root");
+    Printtwodom(GetCgiPath(),"GetCgiPath");
+    std::cout<<"upload  :"<<GetUpload()<<std::endl;
+    std::cout<<"Autoindex  :"<<GetAutoindex()<<std::endl;
+}
+void Location::SetAllDir()
+{
     FillValid();
     checkValidation();
+
     
     SetRoot();
     SetAllowMethods();
@@ -94,7 +103,6 @@ void Location::desplayLocation()
     SetCgiPath();
     SetAutoindex();
     SetPath();
-    Printtwodom(vlocation,"location");
 }
 void Location::Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data)
 {
@@ -153,10 +161,27 @@ void Location::SetPath()
     // }
     path.push_back(arg);
 }
+// void Location::CheckisDup(std::vector<std::string> vec , std::string elemnt)
+// {
+//     std::vector<std::string>::iterator iter ;
+//     int dup = 0;
+    
+//     iter = std::find(vec.begin(),vec.end(),elemnt);
+//     iter = std::find(iter,vec.end(),elemnt);
+//     if (iter == vec.end())
+//     {
+//         throw "Error duplicate methods "+elemnt+" \n";
+//     }
+// }
 void Location::CheckMethods(std::string methd)
 {
     std::vector<std::string> allMethds;
     std::vector<std::string>::iterator iter;
+    if ((get && methd == "GET" ) ||( post && methd == "POST" )|| (dele && methd == "DELETE") )
+    {
+        throw "Error duplicate methods "+methd+" \n";
+    }
+    
     allMethds.push_back("POST");
     allMethds.push_back("GET");
     allMethds.push_back("DELETE");
@@ -164,12 +189,21 @@ void Location::CheckMethods(std::string methd)
     if (iter == allMethds.end())
     {
         throw "error no method "+methd+ " exists\n";
-    } 
+    }
+    if (methd == "POST")
+        post = 1;
+    if (methd == "GET")
+        get = 1;
+    if (methd == "DELETE")
+        dele = 1;
 }
 void Location::SetAllowMethods()
 {
     int i;
     int num = checkDup("allow_methods",i);
+    post = 0;
+    get = 0;
+    dele = 0;
     std::string arg;
     std::vector<std::string> vallow;
     if (num == 0)
@@ -211,7 +245,7 @@ void Location::SetAutoindex()
     {
         throw "The argument  '"+arg+ "' is not valid\n";
     }
-    if (arg == "on ")
+    if (arg == "on")
         autoindex = 1;
     else
         autoindex = 0;
@@ -234,18 +268,11 @@ void Location::SetUpload()
     {
         throw "The argument  '"+arg+ "' is not valid\n";
     }
-    if (arg == "on ")
+    if (arg == "on")
         upload = 1;
     else
         upload = 0;
 }
-
-
-
-
-
-
-
 // void Location::check_Status(std::string status)
 // {
 //     std::vector<std::string>::iterator iter;
@@ -265,6 +292,7 @@ std::vector<std::string>  Location::AddcgiPaths(std::string status,std::string p
 
     return vErrorPage;
 }
+
 void Location::SetCgiPath()
 {
     std::string extantion;
@@ -289,8 +317,6 @@ void Location::SetCgiPath()
     }
     
 }
-
-
 
 /*__________________________________________*/
 /*__________________________________________*/
