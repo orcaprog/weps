@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:31 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/01 18:45:07 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/02 18:17:31 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@ void ParceConf::FillServers()
     }
     
 }
+
 void ParceConf::desplay()
 {
     FillServers();
@@ -130,6 +131,10 @@ void ParceConf::desplay()
     //     std::cout << std::endl;
     // }
 }
+// void ParceConf::CreatSocketServer()
+// {
+    
+// }
 ParceConf::~ParceConf()
 {
 }

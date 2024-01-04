@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/01 20:04:22 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/03 11:34:13 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ void Servers::ParceServers()
         }
         
     }
+    
+    
     std::vector<std::string>::iterator iter;
     std::vector<std::string>::iterator loc;
     iter = vec.begin();
@@ -364,6 +366,8 @@ const std::vector<std::string> & Servers::GetIndex()
     return index;
 }
 
+
+
 /*=======================================================================*/
 /*=======================================================================*/
 size_t Servers::GetIndex(std::string dir)
@@ -507,6 +511,80 @@ while (i < loactions.size())
    
 }
 
+
+
+/*#############################################################*/
+                     /*CREATE SOKCET*/
+/*#############################################################*/
+
+void Servers::CreatSocketServer()
+{
+    
+    struct sockaddr_in address;    
+    if (server_fd = socket(AF_INET , SOCK_STREAM,0) < 0)
+    {
+        perror("connot create socket");
+        return ;
+    }
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons( port[0] );
+    memset(address.sin_zero, '\0', sizeof address.sin_zero);
+    if (bind(server_fd,(struct sockaddr *)&address,sizeof(address)) < 0) 
+    { 
+        perror("bind failed"); 
+        return ; 
+    }
+    if (listen(server_fd, 3) < 0)
+    { 
+        perror("“In listen”");
+        exit(EXIT_FAILURE);
+    }
+}
+/*#############################################################*/
+// void Servers::SetDefaultError()
+// {
+//     error_page.push_back(AddErrorPage("400","400.html"));
+//     error_page.push_back(AddErrorPage("401","401.html"));
+//     error_page.push_back(AddErrorPage("402","402.html"));
+//     error_page.push_back(AddErrorPage("403","403.html"));
+//     error_page.push_back(AddErrorPage("404","404.html"));
+//     error_page.push_back(AddErrorPage("405","405.html"));
+//     error_page.push_back(AddErrorPage("406","406.html"));
+//     error_page.push_back(AddErrorPage("407","407.html"));
+//     error_page.push_back(AddErrorPage("408","408.html"));
+//     error_page.push_back(AddErrorPage("409","409.html"));
+//     error_page.push_back(AddErrorPage("410","410.html"));
+//     error_page.push_back(AddErrorPage("411","411.html"));
+//     error_page.push_back(AddErrorPage("412","412.html"));
+//     error_page.push_back(AddErrorPage("413","413.html"));
+//     error_page.push_back(AddErrorPage("414","414.html"));
+//     error_page.push_back(AddErrorPage("415","415.html"));
+//     error_page.push_back(AddErrorPage("416","416.html"));
+//     error_page.push_back(AddErrorPage("417","417.html"));
+//     error_page.push_back(AddErrorPage("418","418.html"));
+//     error_page.push_back(AddErrorPage("421","421.html"));
+//     error_page.push_back(AddErrorPage("422","422.html"));
+//     error_page.push_back(AddErrorPage("423","423.html"));
+//     error_page.push_back(AddErrorPage("424","424.html"));
+//     error_page.push_back(AddErrorPage("425","425.html"));
+//     error_page.push_back(AddErrorPage("426","426.html"));
+//     error_page.push_back(AddErrorPage("428","428.html"));
+//     error_page.push_back(AddErrorPage("429","429.html"));
+//     error_page.push_back(AddErrorPage("431","431.html"));
+//     error_page.push_back(AddErrorPage("451","451.html"));
+//     error_page.push_back(AddErrorPage("500","500.html"));
+//     error_page.push_back(AddErrorPage("501","501.html"));
+//     error_page.push_back(AddErrorPage("502","502.html"));
+//     error_page.push_back(AddErrorPage("503","503.html"));
+//     error_page.push_back(AddErrorPage("504","504.html"));
+//     error_page.push_back(AddErrorPage("505","505.html"));
+//     error_page.push_back(AddErrorPage("506","506.html"));
+//     error_page.push_back(AddErrorPage("507","507.html"));
+//     error_page.push_back(AddErrorPage("508","508.html"));
+//     error_page.push_back(AddErrorPage("510","510.html"));
+//     error_page.push_back(AddErrorPage("511","511.html"));
+// }
 Servers::Servers()
 {
     

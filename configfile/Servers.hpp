@@ -6,12 +6,24 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:42:27 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/01 18:26:00 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/02 19:40:18 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVERS_HPP
 #define SERVERS_HPP
+
+#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+
+
 
 #include <algorithm> 
 #include <string>
@@ -36,6 +48,7 @@ private:
     std::vector<std::vector<std::string> > error_page;
     std::vector<std::string> s_erorr;
 
+    int server_fd;
 
     std::vector<std::string>  AddErrorPage(std::string status,std::string path);
     int  checkDup(std::string der,int & index);
@@ -92,7 +105,9 @@ public:
             begin++;
         }
     }
+    void SetDefaultError();
 
+    void CreatSocketServer();
     Servers();
     ~Servers();
 };
