@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/04 11:12:59 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/04 11:54:51 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/04 11:59:43 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,15 +94,18 @@ int main()
 		event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, 30000);
 		printf("%d ready events\n", event_count);
 		for (i = 0; i < event_count; i++) {
-			printf("Reading file descriptor '%d' -- ", events[i].data.fd);
-			bytes_read = read(events[i].data.fd, read_buffer, READ_SIZE);
-			printf("%zd bytes read.\n", bytes_read);
-			read_buffer[bytes_read] = '\0';
-			printf("Read '%s'\n", read_buffer);
+			// printf("Reading file descriptor '%d' -- ", events[i].data.fd);
+			// bytes_read = read(events[i].data.fd, read_buffer, READ_SIZE);
+			// printf("%zd bytes read.\n", bytes_read);
+			// read_buffer[bytes_read] = '\0';
+			// printf("Read '%s'\n", read_buffer);
 		
-			if(!strncmp(read_buffer, "stop\n", 5))
-			running = 0;
+			// if(!strncmp(read_buffer, "stop\n", 5))
+			// running = 0;
+            printf("%d \n",i);
 		}
+		printf("%d ready events\n", event_count);
+    
 	}
 
 	if (close(epoll_fd)) {

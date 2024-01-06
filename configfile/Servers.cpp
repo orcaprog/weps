@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/03 11:34:13 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/06 17:59:39 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -520,12 +520,19 @@ while (i < loactions.size())
 void Servers::CreatSocketServer()
 {
     
-    struct sockaddr_in address;    
-    if (server_fd = socket(AF_INET , SOCK_STREAM,0) < 0)
+    if ((server_fd = socket(AF_INET , SOCK_STREAM,0) )< 0)
     {
         perror("connot create socket");
         return ;
     }
+
+    int reuseaddr = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(int)) == -1) {
+        perror("setsockopt");
+        close(server_fd);
+        exit(EXIT_FAILURE);
+    }
+
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons( port[0] );
@@ -540,6 +547,7 @@ void Servers::CreatSocketServer()
         perror("“In listen”");
         exit(EXIT_FAILURE);
     }
+
 }
 /*#############################################################*/
 // void Servers::SetDefaultError()

@@ -6,20 +6,35 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:35 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/02 18:17:36 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/06 18:25:03 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARCECONF_HPP
 #define PARCECONF_HPP
-#include <iostream>
-#include <fstream>
+
+
 #include "Servers.hpp"
 #include <sstream>
 #include <vector>
 #include <deque>
 #include <map>
+#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <sys/epoll.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 
+
+#define MAX_EVENTS 1000
 class ParceConf
 {
 private:
@@ -31,9 +46,20 @@ public:
     Servers FirstFill();
     std::vector<std::string> Split_line(std::string line);
 
+
+    
+    struct epoll_event ev;
+    struct epoll_event events[MAX_EVENTS];
+    int  conn_sock;
+    int nfds;
+    int  epollfd;
+
+    std::map<int,int > msockets;    
     void FillServers();
     void desplay();
-    // void CreatSocketServer();
+    void CreatMUltiplex();
+void Connect_And_Add(int n,int port);
+
     ParceConf(std::string confgfile);
     ~ParceConf();
 };

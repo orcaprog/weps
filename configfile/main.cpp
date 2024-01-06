@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:36:57 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/01 09:34:21 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/06 17:17:51 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int main(int ac , char **av)
     try
     {
         server.desplay();
-        
+        server.CreatMUltiplex();        
     }
     catch(std::string  e)
     {

@@ -11,19 +11,8 @@
 #include <string.h>
 #include <fcntl.h>
     #define MAX_EVENTS 10
-#define PORT 3333
-void setnonblocking(int sockfd) {
-    int flags = fcntl(sockfd, F_GETFL, 0);
-    if (flags == -1) {
-        perror("fcntl F_GETFL");
-        exit(EXIT_FAILURE);
-    }
+#define PORT 8888
 
-    if (fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) == -1) {
-        perror("fcntl F_SETFL O_NONBLOCK");
-        exit(EXIT_FAILURE);
-    }
-}
 #include <unistd.h>
 #include <errno.h>
 
@@ -63,6 +52,11 @@ void do_use_fd(int sockfd) {
 
 int main(int argc, char const *argv[])
 {
+    // int PORT = std::atoi(argv[1]);
+
+        char buffer[1024];
+
+
     int listen_sock, new_socket; long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
@@ -82,7 +76,7 @@ int main(int argc, char const *argv[])
         perror("In socket");
         exit(EXIT_FAILURE);
     }
-    
+     
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
@@ -117,6 +111,7 @@ int main(int argc, char const *argv[])
     //     printf("------------------Hello message sent-------------------\n");
     //     close(new_socket);
     // }
+ssize_t bytesRead;
 
 
 struct epoll_event ev, events[MAX_EVENTS];
@@ -138,21 +133,36 @@ if (epoll_ctl(epollfd, EPOLL_CTL_ADD, listen_sock, &ev) == -1) {
     exit(EXIT_FAILURE);
 }
 
+    std::cout<<"listen sock :"<<listen_sock<<std::endl;
 for (;;) {
     nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+    std::cout<<"nfds :"<<nfds<<std::endl;
     if (nfds == -1) {
         perror("epoll_wait");
         exit(EXIT_FAILURE);
     }
 
     for (int n = 0; n < nfds ; ++n) {
-        if (events[n].data.fd == listen_sock) {
+        // std::cout<<events[n].data.fd<<std::endl;
+        // std::cout<<"nfds :"<<nfds<<std::endl;
+        
+        if (events[n].data.fd == listen_sock) 
+        {
+            std::cout<<n<<std::endl;
+            std::cout<<"Enter server "<<events[n].data.fd<<" \n";
             conn_sock = accept(listen_sock, (struct sockaddr *)&address, (socklen_t*)&addrlen);
             if (conn_sock == -1) {
                 perror("accept");
                 exit(EXIT_FAILURE);
             }
-            setnonblocking(conn_sock);
+            // setnonblocking(conn_sock);
+            if (fcntl(conn_sock, F_SETFL, fcntl(conn_sock, F_GETFL, 0) | O_NONBLOCK) == -1 )
+            {
+                        perror("fcntl F_SETFL O_NONBLOCK");
+                        exit(EXIT_FAILURE);
+            }
+
+
             ev.events = EPOLLIN | EPOLLET;
             ev.data.fd = conn_sock;
             if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock,
@@ -160,10 +170,36 @@ for (;;) {
                 perror("epoll_ctl: conn_sock");
                 exit(EXIT_FAILURE);
             }
-        } else {
-            do_use_fd(events[n].data.fd);
+        } 
+        else 
+        {
+            std::cout<<"Enter clinet "<<events[n].data.fd<<" \n";
+           // do_use_fd(events[n].data.fd);
+            // do
+            // {
+                bytesRead = read(events[n].data.fd,buffer,sizeof(buffer));
+            // } while (bytesRead != -1 && bytesRead != 0); 
+            if (bytesRead == 0) {
+            // Connection closed by the client
+            // Perform cleanup or additional actions if needed
+            close(events[n].data.fd);
+            printf("Connection closed by client\n");
+            }
+            else {
+            // Process the received data
+            // Example: Print the received data
+            printf("Received data from socket %d: %.*s\n", events[n].data.fd, (int)bytesRead, buffer);
+            }
+            
         }
+        std::cout<<"Here for check timeout\n";
     }
 }
+int reuseaddr = 1;
+    if (setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(int)) == -1) {
+        perror("setsockopt");
+        close(listen_sock);
+        exit(EXIT_FAILURE);
+    }
     return 0;
 }
