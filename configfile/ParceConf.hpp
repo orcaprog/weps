@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:35 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/07 15:36:44 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/08 17:26:54 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include "../elidrys/src/request.hpp"
 
 #define MAX_EVENTS 1000
 class ParceConf
@@ -48,7 +49,7 @@ public:
 
 
 
-
+    std::map<int ,request> mClients;
     
     struct epoll_event ev;
     struct epoll_event events[MAX_EVENTS];
@@ -60,7 +61,7 @@ public:
     void FillServers();
     void desplay();
     void CreatMUltiplex();
-void Connect_And_Add(int n,int port,const char * hello);
+    void Connect_And_Add(int n,int port,const char * hello);
 
     ParceConf(std::string confgfile);
     ~ParceConf();

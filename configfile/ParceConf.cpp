@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:31 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/08 09:30:32 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/08 17:54:27 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,10 +192,14 @@ ParceConf::~ParceConf()
 // }
 void ParceConf::Connect_And_Add(int n,int port,const char * hello)
 {
+    request req;
+
+
     struct sockaddr_in address; 
     int adrlen;
     ssize_t bytesRead = 0;
     char buffer[1024];
+
     
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
@@ -231,7 +235,7 @@ void ParceConf::Connect_And_Add(int n,int port,const char * hello)
     else 
     {
         std::cout<<"Enter clinet "<<events[n].data.fd<<" \n";
-         bytesRead = read(events[n].data.fd,buffer,sizeof(buffer));
+        bytesRead = read(events[n].data.fd,buffer,sizeof(buffer));
         //mclinets[byteread] = requst(buffer);
         // get(request) 
         if (bytesRead == 0) 
@@ -242,6 +246,9 @@ void ParceConf::Connect_And_Add(int n,int port,const char * hello)
         else 
         {
             printf("Received data from socket %d: %.*s\n", events[n].data.fd, (int)bytesRead, buffer);
+            req.parce_req(buffer);
+            req.show_inf();
+            mClients[events[n].data.fd] = req;
             write(events[n].data.fd , hello , strlen(hello));
         }
         
@@ -253,22 +260,16 @@ void ParceConf::Connect_And_Add(int n,int port,const char * hello)
 
 void ParceConf::CreatMUltiplex()
 {
-
-
-
-         std::ifstream inputFile;
-     inputFile.open("index.html");
-     std::string line;
-     std::string data= "";
+    std::ifstream inputFile;
+    inputFile.open("index.html");
+    std::string line;
+    std::string data= "";
     while (std::getline(inputFile, line)) {
         data += line;
     }
     std::string headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 10000\r\n\r\n";
     std::string httprespose = headers + data;
     const char *hello = httprespose.c_str();
-
-
-    
 
     epollfd = epoll_create1(0);
     if (epollfd == -1) {
@@ -294,17 +295,13 @@ void ParceConf::CreatMUltiplex()
             exit(EXIT_FAILURE);
         }
         
-        // for (iter = msockets.begin(); iter != msockets.end(); iter++)
-        // {
-            for (int n = 0; n < nfds ; ++n) 
-            {
-                
-                // std::cout<<"nfds :"<<nfds<<"n :"<<n<<std::endl;
-                std::cout<<"____________________________________________________\n";
-                Connect_And_Add(n,iter->second,hello);
-                std::cout<<"____________________________________________________\n";
-            }
-        // }
+        for (int n = 0; n < nfds ; ++n) 
+        {
+            
+            std::cout<<"____________________________________________________\n";
+            Connect_And_Add(n,iter->second,hello);
+            std::cout<<"____________________________________________________\n";
+        }
     }
 
 }

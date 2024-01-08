@@ -1,10 +1,11 @@
 NAME = parce
 
-SRC = main.cpp  ParceConf.cpp Servers.cpp Location.cpp\
+SRC = main.cpp  ParceConf.cpp Servers.cpp Location.cpp \
+	  ../elidrys/src/request.cpp
 
 CXX = c++
 
-CXXFLAGS =  -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g3
+CXXFLAGS =  -Wall -Wextra -Werror -std=c++98 
 
 OBJ = ${SRC:.cpp=.o}
 

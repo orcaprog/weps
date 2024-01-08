@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 09:43:27 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/08 16:28:39 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/08 16:48:04 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,13 @@ int Delete::pathExists(std::string path) {
     return stat(path.c_str(), &fileStat) == 0;
 }
 
-
 Delete::Delete(std::string path)
 {
     if (!pathExists(path))
     {
         throw "Delete Error: path not exist \n";
     }
-    
+    RemoveAllPath(path);
 }
 
 int  Delete::my_remove(std::string file)
@@ -51,7 +50,6 @@ void Delete::RemoveAllPath(std::string path)
         perror("Error opening directory");
         return ;
     }
-    
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type == DT_DIR)
@@ -61,7 +59,6 @@ void Delete::RemoveAllPath(std::string path)
             {
                 RemoveAllPath(path + "/"+entry->d_name);
                 std::cout<<"dir :"<<entry->d_name<<std::endl;
-                
             }
         }
         else
