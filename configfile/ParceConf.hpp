@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:35 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/06 18:25:03 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/07 15:36:44 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ public:
     std::vector<std::string> Split_line(std::string line);
 
 
+
+
     
     struct epoll_event ev;
     struct epoll_event events[MAX_EVENTS];
@@ -58,7 +60,7 @@ public:
     void FillServers();
     void desplay();
     void CreatMUltiplex();
-void Connect_And_Add(int n,int port);
+void Connect_And_Add(int n,int port,const char * hello);
 
     ParceConf(std::string confgfile);
     ~ParceConf();

@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:31 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/06 18:31:14 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/08 09:30:32 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,43 +158,43 @@ ParceConf::~ParceConf()
 //     }
 
 
-void do_use_fd(int sockfd) {
-    char buffer[1024];
-    ssize_t bytesRead;
+// void do_use_fd(int sockfd) {
+//     char buffer[1024];
+//     ssize_t bytesRead;
 
-    for (;;) {
-        // Read data from the socket
-        bytesRead = read(sockfd, buffer, sizeof(buffer));
+//     for (;;) {
+//         // Read data from the socket
+//         bytesRead = read(sockfd, buffer, sizeof(buffer));
 
-        if (bytesRead == -1) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // No more data available for now, exit the loop
-                break;
-            } else {
-                perror("read");
-                // Handle other read errors
-                break;
-            }
-        } else if (bytesRead == 0) {
-            // Connection closed by the client
-            // Perform cleanup or additional actions if needed
-            close(sockfd);
-            printf("Connection closed by client\n");
-            break;
-        } else {
-            // Process the received data
-            // Example: Print the received data
-            printf("Received data from socket %d: %.*s\n", sockfd, (int)bytesRead, buffer);
-        }
-    }
+//         if (bytesRead == -1) {
+//             if (errno == EAGAIN || errno == EWOULDBLOCK) {
+//                 // No more data available for now, exit the loop
+//                 break;
+//             } else {
+//                 perror("read");
+//                 // Handle other read errors
+//                 break;
+//             }
+//         } else if (bytesRead == 0) {
+//             // Connection closed by the client
+//             // Perform cleanup or additional actions if needed
+//             close(sockfd);
+//             printf("Connection closed by client\n");
+//             break;
+//         } else {
+//             // Process the received data
+//             // Example: Print the received data
+//             printf("Received data from socket %d: %.*s\n", sockfd, (int)bytesRead, buffer);
+//         }
+//     }
 
-    // Continue processing or return to the event loop
-}
-void ParceConf::Connect_And_Add(int n,int port)
+//     // Continue processing or return to the event loop
+// }
+void ParceConf::Connect_And_Add(int n,int port,const char * hello)
 {
     struct sockaddr_in address; 
     int adrlen;
-    ssize_t bytesRead;
+    ssize_t bytesRead = 0;
     char buffer[1024];
     
     address.sin_family = AF_INET;
@@ -231,8 +231,9 @@ void ParceConf::Connect_And_Add(int n,int port)
     else 
     {
         std::cout<<"Enter clinet "<<events[n].data.fd<<" \n";
-        bytesRead = read(events[n].data.fd,buffer,sizeof(buffer));
-
+         bytesRead = read(events[n].data.fd,buffer,sizeof(buffer));
+        //mclinets[byteread] = requst(buffer);
+        // get(request) 
         if (bytesRead == 0) 
         {
             close(events[n].data.fd);
@@ -241,7 +242,9 @@ void ParceConf::Connect_And_Add(int n,int port)
         else 
         {
             printf("Received data from socket %d: %.*s\n", events[n].data.fd, (int)bytesRead, buffer);
+            write(events[n].data.fd , hello , strlen(hello));
         }
+        
         // do_use_fd(events[n].data.fd);
     }
     std::cout<<"Here for check timeout\n";   
@@ -250,6 +253,22 @@ void ParceConf::Connect_And_Add(int n,int port)
 
 void ParceConf::CreatMUltiplex()
 {
+
+
+
+         std::ifstream inputFile;
+     inputFile.open("index.html");
+     std::string line;
+     std::string data= "";
+    while (std::getline(inputFile, line)) {
+        data += line;
+    }
+    std::string headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 10000\r\n\r\n";
+    std::string httprespose = headers + data;
+    const char *hello = httprespose.c_str();
+
+
+    
 
     epollfd = epoll_create1(0);
     if (epollfd == -1) {
@@ -282,7 +301,7 @@ void ParceConf::CreatMUltiplex()
                 
                 // std::cout<<"nfds :"<<nfds<<"n :"<<n<<std::endl;
                 std::cout<<"____________________________________________________\n";
-                Connect_And_Add(n,iter->second);
+                Connect_And_Add(n,iter->second,hello);
                 std::cout<<"____________________________________________________\n";
             }
         // }
