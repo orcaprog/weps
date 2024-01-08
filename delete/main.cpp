@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 09:51:38 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/08 14:48:11 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/08 16:30:44 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int main()
 
     try
     {
-        Delete delet("/nfs/homes/abouassi/Desktop/wepserv/delete/dfdf");
+        Delete delet("ex");
     }
     catch(const char * e)
     {
