@@ -63,6 +63,11 @@ private:
     void ParceServers();    
     
     void Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data);
+
+
+
+    void ReplacePath(std::string status,std::string path);
+
 public:
 
     std::vector<int> port;
@@ -73,7 +78,6 @@ public:
     std::vector<long long int > client_max_body_size;
     std::vector<std::vector<std::string> > error_page;
     std::vector<std::string> s_erorr;
-
 
 
     int server_fd;

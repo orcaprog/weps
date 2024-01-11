@@ -67,6 +67,7 @@ int Location::checkDup(std::string der,int & index)
     size_t i = 0;
     while ( i < vlocation.size())
     {
+        
         if (vlocation[i][0] == der)
         {
             index = i;

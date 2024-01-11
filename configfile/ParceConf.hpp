@@ -47,9 +47,10 @@ public:
     Servers FirstFill();
     std::vector<std::string> Split_line(std::string line);
 
+void Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data);
 
-
-    std::map<int ,request> mClients;
+    std::map<int ,Servers> mSclServ;
+    std::map<int ,std::pair<Servers,request> > mClients;
     
     struct epoll_event ev;
     struct epoll_event events[MAX_EVENTS];
@@ -57,11 +58,11 @@ public:
     int nfds;
     int  epollfd;
 
-    std::map<int,int > msockets;    
+    std::map<int,Servers > msockets;    
     void FillServers();
     void desplay();
     void CreatMUltiplex();
-    void Connect_And_Add(int n,int port,const char * hello);
+    void Connect_And_Add(int n,const char * hello);
 
     ParceConf(std::string confgfile);
     ~ParceConf();

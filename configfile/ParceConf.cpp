@@ -44,7 +44,6 @@ ParceConf::ParceConf(std::string confgfile)
                 {
                     Vconf.push_back(_split);
                 }
-                
             }
         }
         configfile.close();
@@ -116,13 +115,13 @@ void ParceConf::desplay()
     size_t i = 0;
     while (i < Vservers.size())
     {
-        std::cout<<"###############################"<<std::endl;
+        // std::cout<<"###############################"<<std::endl;
         
         Vservers[i].SetAllDir();
         Vservers[i].CreatSocketServer();
-        msockets[Vservers[i].server_fd] = Vservers[i].port[0];
+        msockets[Vservers[i].server_fd] = Vservers[i];
         // Vservers[i].desplay();
-        std::cout<<"###############################"<<std::endl;
+        // std::cout<<"###############################"<<std::endl;
         i++;
     }
     // for (size_t  i = 0; i < vsockets.size();i++)
@@ -190,41 +189,35 @@ ParceConf::~ParceConf()
 
 //     // Continue processing or return to the event loop
 // }
-void ParceConf::Connect_And_Add(int n,int port,const char * hello)
+void ParceConf::Connect_And_Add(int n,const char * hello)
 {
-    request req;
-
-
-    struct sockaddr_in address; 
     int adrlen;
     ssize_t bytesRead = 0;
     char buffer[1024];
-
     
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( port );
-    adrlen = sizeof(address);
-    
-    std::map<int, int>::iterator iter = msockets.find(events[n].data.fd );
+    std::map<int, Servers>::iterator iter = msockets.find(events[n].data.fd );
     if (iter != msockets.end()) 
     {   
-        // std::cout<<n<<std::endl;
-        // std::cout<<"Enter server "<<events[n].data.fd<<" \n";
-        conn_sock = accept(iter->first, (struct sockaddr *)&address, (socklen_t*)&adrlen);
+        adrlen = sizeof(iter->second.address);
+        conn_sock = accept(iter->first, (struct sockaddr *)&iter->second.address, (socklen_t*)&adrlen);
         if (conn_sock == -1) {
             perror("accept");
             exit(EXIT_FAILURE);
         }
-        // setnonblocking(conn_sock);
-        // if (fcntl(conn_sock, F_SETFL, fcntl(conn_sock, F_GETFL, 0) | O_NONBLOCK) == -1 )
-        // {
-        //             perror("fcntl F_SETFL O_NONBLOCK");
-        //             exit(EXIT_FAILURE);
-        // }
 
+        mClients[conn_sock].first = iter->second;
+        
 
-        ev.events = EPOLLIN | EPOLLET;
+        std::cout<<mClients[conn_sock].first.root[0]<<std::endl;
+        request req(mClients[conn_sock].first.root[0]);
+
+        req.check_path();
+        mClients[conn_sock].second = req;
+        // mClients[conn_sock].second.check_path();
+        std::cout<<"   :"<<req.req_path<<std::endl;
+        std::cout<<"   :"<<mClients[conn_sock].second.req_path<<std::endl;
+
+        ev.events = EPOLLIN | EPOLLOUT;
         ev.data.fd = conn_sock;
         if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock,&ev) == -1) 
         {
@@ -234,27 +227,47 @@ void ParceConf::Connect_And_Add(int n,int port,const char * hello)
     } 
     else 
     {
-        std::cout<<"Enter clinet "<<events[n].data.fd<<" \n";
-        bytesRead = read(events[n].data.fd,buffer,sizeof(buffer));
-        //mclinets[byteread] = requst(buffer);
-        // get(request) 
-        if (bytesRead == 0) 
+        if (events[n].events & EPOLLIN) 
         {
-            close(events[n].data.fd);
-            printf("Connection closed by client\n");
+            std::cout<<"Enter clinet "<<events[n].data.fd<<" \n";
+            bytesRead = read(events[n].data.fd,buffer,sizeof(buffer)-1);
+            if (bytesRead == -1)
+            {
+                perror("Error read\n");
+                return ;
+            }
+            if (bytesRead == 0) 
+            {
+                close(events[n].data.fd);
+                std::cout<<"Connection closed by client\n"; 
+            }
+            else 
+            {
+                buffer[bytesRead] = '\0';
+                std::cout<<"Received data from socket "<< buffer<<std::endl; 
+                std::map<int ,std::pair<Servers,request> >::iterator iter2 = mClients.find(events[n].data.fd);
+                if (iter2 != mClients.end())
+                {
+                    mClients[events[n].data.fd].second.parce_req(buffer);
+                }
+            }
         }
-        else 
-        {
-            printf("Received data from socket %d: %.*s\n", events[n].data.fd, (int)bytesRead, buffer);
-            req.parce_req(buffer);
-            req.show_inf();
-            mClients[events[n].data.fd] = req;
-            write(events[n].data.fd , hello , strlen(hello));
-        }
-        
         // do_use_fd(events[n].data.fd);
+        else if (events[n].events & EPOLLOUT && mClients.find(events[n].data.fd) !=  mClients.end()) 
+        {
+            // std::cout<<"req done   :_____"<<mClients[events[n].data.fd].req_done()<<std::endl;
+            if (mClients[events[n].data.fd].second.req_done())
+            {
+                write(events[n].data.fd ,hello , strlen(hello));
+                close(events[n].data.fd);
+                mClients.erase(events[n].data.fd);
+                std::cout<<"enter in epoluout\n";
+            }
+        }
     }
-    std::cout<<"Here for check timeout\n";   
+
+    // std::cout<<"Here for check timeout\n";   
+    // std::cout<<"Here :"<<req.body_state<<std::endl;   
 }
 
 
@@ -271,12 +284,12 @@ void ParceConf::CreatMUltiplex()
     std::string httprespose = headers + data;
     const char *hello = httprespose.c_str();
 
-    epollfd = epoll_create1(0);
+    epollfd = epoll_create(255);
     if (epollfd == -1) {
         perror("epoll_create1");
         exit(EXIT_FAILURE);
     }
-    std::map<int,int>::iterator iter;
+    std::map<int,Servers>::iterator iter;
 
     for (iter = msockets.begin(); iter != msockets.end(); iter++)
     {
@@ -290,6 +303,7 @@ void ParceConf::CreatMUltiplex()
     while (true)
     {
         nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+        // std::cout<<"nfds   :"<<nfds<<std::endl;
         if (nfds == -1) {
             perror("epoll_wait");
             exit(EXIT_FAILURE);
@@ -297,10 +311,7 @@ void ParceConf::CreatMUltiplex()
         
         for (int n = 0; n < nfds ; ++n) 
         {
-            
-            std::cout<<"____________________________________________________\n";
-            Connect_And_Add(n,iter->second,hello);
-            std::cout<<"____________________________________________________\n";
+            Connect_And_Add(n,hello);
         }
     }
 

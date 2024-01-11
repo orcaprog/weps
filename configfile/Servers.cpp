@@ -23,8 +23,6 @@ void Servers::ParceServers()
         }
         
     }
-    
-    
     std::vector<std::string>::iterator iter;
     std::vector<std::string>::iterator loc;
     iter = vec.begin();
@@ -283,6 +281,19 @@ std::vector<std::string>  Servers::AddErrorPage(std::string status,std::string p
 
     return vErrorPage;
 }
+void Servers::ReplacePath(std::string status,std::string path)
+{
+    for (size_t i = 0; i < error_page.size(); i++)
+    {
+        if (error_page[i][0] == status)
+        {
+            error_page[i][1] = path;
+            return ;
+        }
+        
+    }
+    
+}
 void Servers::SetError_page()
 {
     std::string status;
@@ -302,10 +313,9 @@ void Servers::SetError_page()
             {
                 throw ("Path '"+path+"' does not exist.\n");
             }
-            error_page.push_back(AddErrorPage(status,path));
+            ReplacePath(status,path);
         }
     }
-    
 }
 
 void Servers::SetAllDir()
@@ -548,51 +558,52 @@ void Servers::CreatSocketServer()
 
 }
 /*#############################################################*/
-// void Servers::SetDefaultError()
-// {
-//     error_page.push_back(AddErrorPage("400","400.html"));
-//     error_page.push_back(AddErrorPage("401","401.html"));
-//     error_page.push_back(AddErrorPage("402","402.html"));
-//     error_page.push_back(AddErrorPage("403","403.html"));
-//     error_page.push_back(AddErrorPage("404","404.html"));
-//     error_page.push_back(AddErrorPage("405","405.html"));
-//     error_page.push_back(AddErrorPage("406","406.html"));
-//     error_page.push_back(AddErrorPage("407","407.html"));
-//     error_page.push_back(AddErrorPage("408","408.html"));
-//     error_page.push_back(AddErrorPage("409","409.html"));
-//     error_page.push_back(AddErrorPage("410","410.html"));
-//     error_page.push_back(AddErrorPage("411","411.html"));
-//     error_page.push_back(AddErrorPage("412","412.html"));
-//     error_page.push_back(AddErrorPage("413","413.html"));
-//     error_page.push_back(AddErrorPage("414","414.html"));
-//     error_page.push_back(AddErrorPage("415","415.html"));
-//     error_page.push_back(AddErrorPage("416","416.html"));
-//     error_page.push_back(AddErrorPage("417","417.html"));
-//     error_page.push_back(AddErrorPage("418","418.html"));
-//     error_page.push_back(AddErrorPage("421","421.html"));
-//     error_page.push_back(AddErrorPage("422","422.html"));
-//     error_page.push_back(AddErrorPage("423","423.html"));
-//     error_page.push_back(AddErrorPage("424","424.html"));
-//     error_page.push_back(AddErrorPage("425","425.html"));
-//     error_page.push_back(AddErrorPage("426","426.html"));
-//     error_page.push_back(AddErrorPage("428","428.html"));
-//     error_page.push_back(AddErrorPage("429","429.html"));
-//     error_page.push_back(AddErrorPage("431","431.html"));
-//     error_page.push_back(AddErrorPage("451","451.html"));
-//     error_page.push_back(AddErrorPage("500","500.html"));
-//     error_page.push_back(AddErrorPage("501","501.html"));
-//     error_page.push_back(AddErrorPage("502","502.html"));
-//     error_page.push_back(AddErrorPage("503","503.html"));
-//     error_page.push_back(AddErrorPage("504","504.html"));
-//     error_page.push_back(AddErrorPage("505","505.html"));
-//     error_page.push_back(AddErrorPage("506","506.html"));
-//     error_page.push_back(AddErrorPage("507","507.html"));
-//     error_page.push_back(AddErrorPage("508","508.html"));
-//     error_page.push_back(AddErrorPage("510","510.html"));
-//     error_page.push_back(AddErrorPage("511","511.html"));
-// }
+void Servers::SetDefaultError()
+{
+    error_page.push_back(AddErrorPage("400","400.html"));
+    error_page.push_back(AddErrorPage("401","401.html"));
+    error_page.push_back(AddErrorPage("402","402.html"));
+    error_page.push_back(AddErrorPage("403","403.html"));
+    error_page.push_back(AddErrorPage("404","404.html"));
+    error_page.push_back(AddErrorPage("405","405.html"));
+    error_page.push_back(AddErrorPage("406","406.html"));
+    // error_page.push_back(AddErrorPage("407","407.html"));
+    // error_page.push_back(AddErrorPage("408","408.html"));
+    // error_page.push_back(AddErrorPage("409","409.html"));
+    // error_page.push_back(AddErrorPage("410","410.html"));
+    // error_page.push_back(AddErrorPage("411","411.html"));
+    // error_page.push_back(AddErrorPage("412","412.html"));
+    // error_page.push_back(AddErrorPage("413","413.html"));
+    // error_page.push_back(AddErrorPage("414","414.html"));
+    // error_page.push_back(AddErrorPage("415","415.html"));
+    // error_page.push_back(AddErrorPage("416","416.html"));
+    // error_page.push_back(AddErrorPage("417","417.html"));
+    // error_page.push_back(AddErrorPage("418","418.html"));
+    // error_page.push_back(AddErrorPage("421","421.html"));
+    // error_page.push_back(AddErrorPage("422","422.html"));
+    // error_page.push_back(AddErrorPage("423","423.html"));
+    // error_page.push_back(AddErrorPage("424","424.html"));
+    // error_page.push_back(AddErrorPage("425","425.html"));
+    // error_page.push_back(AddErrorPage("426","426.html"));
+    // error_page.push_back(AddErrorPage("428","428.html"));
+    // error_page.push_back(AddErrorPage("429","429.html"));
+    // error_page.push_back(AddErrorPage("431","431.html"));
+    // error_page.push_back(AddErrorPage("451","451.html"));
+    // error_page.push_back(AddErrorPage("500","500.html"));
+    // error_page.push_back(AddErrorPage("501","501.html"));
+    // error_page.push_back(AddErrorPage("502","502.html"));
+    // error_page.push_back(AddErrorPage("503","503.html"));
+    // error_page.push_back(AddErrorPage("504","504.html"));
+    // error_page.push_back(AddErrorPage("505","505.html"));
+    // error_page.push_back(AddErrorPage("506","506.html"));
+    // error_page.push_back(AddErrorPage("507","507.html"));
+    // error_page.push_back(AddErrorPage("508","508.html"));
+    // error_page.push_back(AddErrorPage("510","510.html"));
+    // error_page.push_back(AddErrorPage("511","511.html"));
+}
 Servers::Servers()
 {
+    SetDefaultError();
     
 }
 
