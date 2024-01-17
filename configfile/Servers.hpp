@@ -109,6 +109,7 @@ public:
             begin++;
         }
     }
+    Location & getLocation(std::string);
     void SetDefaultError();
 
     void CreatSocketServer();

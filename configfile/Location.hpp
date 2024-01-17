@@ -26,15 +26,6 @@
 class Location
 {
 private:
-        std::vector<std::string> path;
-        std::vector<std::string> root;
-        std::vector<std::string >  allow_methods;
-        bool autoindex ;
-        bool upload;
-        std::vector<std::vector<std::string > >  cgi_path;
-        bool get;
-        bool post;
-        bool dele;
 
 
         void parce_location();  
@@ -56,6 +47,20 @@ private:
         void Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data);
         int pathExists(std::string path);
 public:
+        std::vector<std::string> path;
+        std::vector<std::string> root;
+        std::vector<std::string >  allow_methods;
+        bool autoindex ;
+        bool upload;
+        std::vector<std::vector<std::string > >  cgi_path;
+        bool get;
+        bool post;
+        bool dele;
+
+
+
+
+        
         void desplayLocation();
         void SetAllDir();
         const std::vector<std::string> & GetPath();

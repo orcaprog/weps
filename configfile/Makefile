@@ -1,7 +1,9 @@
 NAME = parce
 
-SRC = main.cpp  ParceConf.cpp Servers.cpp Location.cpp \
-	  ../elidrys/src/request.cpp
+SRC = main.cpp  ParceConf.cpp Servers.cpp Location.cpp Cgi.cpp \
+	  ../elidrys/src/Request.cpp\
+	  ../elidrys/src/Get.cpp\
+	  ../elidrys/src/Method.cpp\
 
 CXX = c++
 

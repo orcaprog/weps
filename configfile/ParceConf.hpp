@@ -13,7 +13,7 @@
 #ifndef PARCECONF_HPP
 #define PARCECONF_HPP
 
-
+#include  <string>
 #include "Servers.hpp"
 #include <sstream>
 #include <vector>
@@ -33,7 +33,12 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "../elidrys/src/request.hpp"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+#include "../elidrys/src/Request.hpp"
 
 #define MAX_EVENTS 1000
 class ParceConf
@@ -47,10 +52,10 @@ public:
     Servers FirstFill();
     std::vector<std::string> Split_line(std::string line);
 
-void Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data);
+    void Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data);
 
     std::map<int ,Servers> mSclServ;
-    std::map<int ,std::pair<Servers,request> > mClients;
+    std::map<int ,std::pair<Servers,Request> > mClients;
     
     struct epoll_event ev;
     struct epoll_event events[MAX_EVENTS];

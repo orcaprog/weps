@@ -12,6 +12,21 @@
 
 #include "Servers.hpp"
 
+Location & Servers::getLocation(std::string path)
+{
+    size_t i;
+    for (i = 0; i < loactions.size(); i++)
+    {
+        if(loactions[i].path[0] == path )
+        {
+            return loactions[i];
+        }
+        
+    }
+    return loactions[i];
+}
+
+
 void Servers::ParceServers()
 {
     std::vector<std::string> vec;

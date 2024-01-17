@@ -194,7 +194,7 @@ void ParceConf::Connect_And_Add(int n,const char * hello)
     int adrlen;
     ssize_t bytesRead = 0;
     char buffer[1024];
-    
+    // 2 5 7 8 9
     std::map<int, Servers>::iterator iter = msockets.find(events[n].data.fd );
     if (iter != msockets.end()) 
     {   
@@ -206,16 +206,10 @@ void ParceConf::Connect_And_Add(int n,const char * hello)
         }
 
         mClients[conn_sock].first = iter->second;
-        
+        Request req(mClients[conn_sock].first.root[0]);
 
-        std::cout<<mClients[conn_sock].first.root[0]<<std::endl;
-        request req(mClients[conn_sock].first.root[0]);
-
-        req.check_path();
         mClients[conn_sock].second = req;
-        // mClients[conn_sock].second.check_path();
-        std::cout<<"   :"<<req.req_path<<std::endl;
-        std::cout<<"   :"<<mClients[conn_sock].second.req_path<<std::endl;
+        std::cout<<"Fd Server :"<<iter->first<<std::endl;
 
         ev.events = EPOLLIN | EPOLLOUT;
         ev.data.fd = conn_sock;
@@ -230,7 +224,9 @@ void ParceConf::Connect_And_Add(int n,const char * hello)
         if (events[n].events & EPOLLIN) 
         {
             std::cout<<"Enter clinet "<<events[n].data.fd<<" \n";
-            bytesRead = read(events[n].data.fd,buffer,sizeof(buffer)-1);
+            bytesRead = read(events[n].data.fd,buffer,1024);
+            
+            std::cout<<"size :"<<bytesRead<<std::endl;
             if (bytesRead == -1)
             {
                 perror("Error read\n");
@@ -243,12 +239,19 @@ void ParceConf::Connect_And_Add(int n,const char * hello)
             }
             else 
             {
-                buffer[bytesRead] = '\0';
-                std::cout<<"Received data from socket "<< buffer<<std::endl; 
-                std::map<int ,std::pair<Servers,request> >::iterator iter2 = mClients.find(events[n].data.fd);
+
+                
+                std::map<int ,std::pair<Servers,Request> >::iterator iter2 = mClients.find(events[n].data.fd);
                 if (iter2 != mClients.end())
                 {
-                    mClients[events[n].data.fd].second.parce_req(buffer);
+                    mClients[events[n].data.fd].second.parce_req(string("").append(buffer,bytesRead));
+                    std::cout<<"requast line path :"<<mClients[events[n].data.fd].second.r_path<<std::endl;
+                    if (mClients[events[n].data.fd].second.r_path.find("/cgi") != std::string::npos)
+                    {
+                        mClients[events[n].data.fd].first.getLocation("/cgi");
+                    }
+                    
+                    
                 }
             }
         }
@@ -258,14 +261,16 @@ void ParceConf::Connect_And_Add(int n,const char * hello)
             // std::cout<<"req done   :_____"<<mClients[events[n].data.fd].req_done()<<std::endl;
             if (mClients[events[n].data.fd].second.req_done())
             {
+                
+
                 write(events[n].data.fd ,hello , strlen(hello));
                 close(events[n].data.fd);
                 mClients.erase(events[n].data.fd);
-                std::cout<<"enter in epoluout\n";
+
+                // std::cout<<"enter in epoluout\n";
             }
         }
     }
-
     // std::cout<<"Here for check timeout\n";   
     // std::cout<<"Here :"<<req.body_state<<std::endl;   
 }
@@ -280,7 +285,7 @@ void ParceConf::CreatMUltiplex()
     while (std::getline(inputFile, line)) {
         data += line;
     }
-    std::string headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 10000\r\n\r\n";
+    std::string headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 1000000\r\n\r\n";
     std::string httprespose = headers + data;
     const char *hello = httprespose.c_str();
 
