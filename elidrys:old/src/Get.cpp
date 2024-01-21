@@ -1,8 +1,6 @@
 
 #include "Get.hpp"
 
-
-
 Get::Get(){
     ;
 }

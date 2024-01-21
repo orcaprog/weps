@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/17 15:53:23 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/17 15:56:08 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/19 10:01:41 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,28 @@
 
 #include "Servers.hpp"
 #include "Location.hpp"
+
+#include <iostream>
+   #include <sys/types.h>
+       #include <sys/wait.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string>
+#include <sys/types.h>
+#include <unistd.h>
+
 using namespace std;
 class Cgi
 {
-private:
-    /* data */
+string exta;
+char **cmds;
+std::string const *command[2];
 public:
-    Cgi(std::string path ,Location location);
+    
+    int fd;
+    string findCgiPath(Location & location , string & path);
+    void ExecCgi();
+    Cgi(std::string & path,Location & location);
     ~Cgi();
 };
 

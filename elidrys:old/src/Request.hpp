@@ -8,6 +8,7 @@ using namespace std;
 
 class Request
 {
+    
 std::stringstream sstr;
 std::string req_h;
 std::string root_path;

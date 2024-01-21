@@ -6,25 +6,30 @@ Request::Request()
     body_state = 0;
     body_size = 0;
     root_path = "/nfs/homes/abouassi/Desktop/webserv";
+    method = NULL;
 }
+
 
 
 Request::Request(string& root_path1){
     body_state = 0;
     body_size = 0;
     root_path = root_path1;
+    method = NULL;
 }
 
 int Request::spl_reqh_body(string s1)
 {
     if (body_state){
         body = s1;
+        cout<<"----------"<< body<<"------------\n";
         body_size += body.size();
         return 0;
     }
     if (s1.find("\r\n\r\n", 0) != s1.npos)
     {
         body = s1.substr(s1.find("\r\n\r\n", 0) + 4);
+        cout<<"----------"<< body<<"------------\n";
         cout << "--_______Lheaders Te9raw Kolhom________--\n" << endl;
         req_h += s1.substr(0, s1.find("\r\n\r\n", 0));
         cout <<"#################\n"<< req_h <<"\n##############"<< endl;
@@ -155,6 +160,7 @@ void Request::show_inf() const
 }
 
 Request::Request(const Request& req1){
+    method = NULL;
     *this = req1;
 }
 
@@ -180,6 +186,8 @@ Method* Request::create_method(const string &type){
 
 Request& Request::operator=(const Request& oth){
     if (this != &oth){
+        delete method;
+        method = oth.method;
         root_path = oth.root_path;
         body_state = oth.body_state;
         body_size = oth.body_size;
@@ -194,5 +202,5 @@ Request& Request::operator=(const Request& oth){
 }
 
 Request::~Request(){
-    ;
+    delete method;
 }

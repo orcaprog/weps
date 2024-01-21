@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:03 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/01 11:35:29 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/18 15:32:42 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,18 @@ void Location::checkValidation()
             throw "Error : Invalid Derecties\n";
         }
     }
+}
+
+std::string Location::getCmdCgi(std::string & exta)
+{
+    for (size_t i = 0; i < cgi_path.size(); i++)
+    {
+        if (cgi_path[i][0]    == exta)
+        {
+            return cgi_path[i][1];
+        }
+    }
+    return "";
 }
 
 int Location::pathExists(std::string path) {

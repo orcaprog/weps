@@ -1,4 +1,3 @@
-
 #include "multiblex.hpp"
 
 void test(const string& file_name)

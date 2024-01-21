@@ -1,4 +1,3 @@
-
 #include "Method.hpp"
 
 Method::Method(){

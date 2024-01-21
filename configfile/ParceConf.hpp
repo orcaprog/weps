@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:35 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/08 17:26:54 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/19 10:45:31 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@
 #include <string>
 #include <vector>
 
+#include "Cgi.hpp"
+
 #include "../elidrys/src/Request.hpp"
 
 #define MAX_EVENTS 1000
@@ -67,8 +69,14 @@ public:
     void FillServers();
     void desplay();
     void CreatMUltiplex();
-    void Connect_And_Add(int n,const char * hello);
+    void Connect_And_Add(int n);
 
+    void In_Events(int n);
+    void Out_Events(int n);
+
+    bool checkvalidHeader(std::string str);
+
+    int fd;
     ParceConf(std::string confgfile);
     ~ParceConf();
 };

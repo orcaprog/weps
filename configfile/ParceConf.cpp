@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:31 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/08 17:54:27 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/19 17:22:26 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ ParceConf::ParceConf(std::string confgfile)
         }
         configfile.close();
     }
+    fd = -2;
 }
 
 Servers ParceConf::FirstFill()
@@ -92,16 +93,6 @@ void ParceConf::FillServers()
     std::vector<std::string> Vcol;
     std::vector<std::string>::iterator iter;
 
-    // if(Vconf[0][0] != "server")
-    // {
-    //     throw "Error : no server derectires";
-    // }
-    // for (size_t i = 0; i < Vconf.size(); i++)
-    // {
-        
-    //     Vcol = Vconf[i];
-    //     Vservers[x].vconf.push_back(Vcol);
-    // }
     while (index < Vconf.size())
     {
         Vservers.push_back(FirstFill());
@@ -189,28 +180,152 @@ ParceConf::~ParceConf()
 
 //     // Continue processing or return to the event loop
 // }
-void ParceConf::Connect_And_Add(int n,const char * hello)
+std::string chekIf(bool check)
+{
+    if (check)
+        return "";
+    else
+        return  "Content-type: text/html\r\n\r\n"; 
+}
+bool ParceConf::checkvalidHeader(std::string str)
+{
+    size_t pos;
+    pos = str.find("Content-type:");
+    if (pos == string::npos)
+    {
+        return 0;
+    }
+    if (pos != 0)
+    {
+        return 0;
+    }
+    pos = str.find("\r\n");
+    if (pos == string::npos)
+    {
+        return 0;
+    }
+    return 1;
+}
+void ParceConf::Out_Events(int n)
+{
+    char cgiBuffer[1024];
+    std::string cgires("");
+    string globRusl;
+
+    if (mClients[events[n].data.fd].second.req_done())
+    {
+        
+        if (fd != -2)
+        {
+            int readb = 1;
+            bool check_cont;
+            while (readb != 0)
+            {
+                readb = read(fd,cgiBuffer,1024);
+                cout<<"read byts :"<<readb<<endl;
+                cout<<"fd  :"<<fd<<endl;
+                if (readb == 0)
+                    break;
+                std::cout<<"fd != -2   fd :"<<fd<<"\n";
+                if (readb == -1)
+                {
+                    perror("Erorr read in cgi\n");
+                    exit(1);
+                }
+                cgires.append(cgiBuffer,readb);
+            }
+            std::cout<<"enter here :"<<cgires<<endl;
+            check_cont = checkvalidHeader(cgires);
+            std::cout<<check_cont<<endl;
+            globRusl = "HTTP/1.1 200 OK\r\n" + chekIf(check_cont) + cgires;
+            write(events[n].data.fd,globRusl.c_str(),globRusl.length());
+            epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);
+            close(fd);
+            close(events[n].data.fd);
+            mClients.erase(events[n].data.fd);
+            fd = -2;
+        }
+        else
+        {
+            mClients[events[n].data.fd].second.process_req(string(""),0,EPOLLOUT);
+
+            string res = mClients[events[n].data.fd].second.get_respons();
+
+            write(events[n].data.fd , res.c_str(), res.size());
+            if (mClients[events[n].data.fd].second.method && mClients[events[n].data.fd].second.method->end)
+            {
+                epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);
+                close(events[n].data.fd);
+                mClients.erase(events[n].data.fd);
+                cout<<"close connections :"<<events[n].data.fd<<endl;
+            }
+        }
+    }
+}
+
+void ParceConf::In_Events(int n)
+{
+    char buffer[1024];
+    ssize_t bytesRead = 0;
+
+    std::cout<<"Enter clinet "<<events[n].data.fd<<" \n";
+    bytesRead = read(events[n].data.fd,buffer,1024);
+    
+    std::cout<<"size :"<<bytesRead<<std::endl;
+    if (bytesRead == -1)
+    {
+        perror("Error read\n");
+        return ;
+    }
+    if (bytesRead == 0) 
+    {
+        close(events[n].data.fd);
+        std::cout<<"Connection closed by client\n"; 
+    }
+    else 
+    {
+        std::map<int ,std::pair<Servers,Request> >::iterator iter2 = mClients.find(events[n].data.fd);
+        if (iter2 != mClients.end())
+        {
+            
+            mClients[events[n].data.fd].second.process_req(string("").append(buffer, bytesRead),bytesRead,EPOLLIN);
+            if (mClients[events[n].data.fd].second.r_path == "/favicon.ico")
+            {
+                epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);
+                close(events[n].data.fd);
+                mClients.erase(events[n].data.fd);
+                cout<<"close connections :"<<events[n].data.fd<<endl;
+            }
+            
+            // if (mClients[events[n].data.fd].second.r_path.find("/cgi") != std::string::npos)
+            // {
+            //     Cgi cgi(mClients[events[n].data.fd].second.r_path,mClients[events[n].data.fd].first.getLocation("/cgi"));
+            //     std::cout<<"enter here\n";
+            //     cgi.ExecCgi();
+            //     fd  = open("out.txt",O_RDONLY);
+            // }
+        }
+    }
+}
+
+void ParceConf::Connect_And_Add(int n)
 {
     int adrlen;
-    ssize_t bytesRead = 0;
-    char buffer[1024];
-    // 2 5 7 8 9
     std::map<int, Servers>::iterator iter = msockets.find(events[n].data.fd );
     if (iter != msockets.end()) 
     {   
         adrlen = sizeof(iter->second.address);
         conn_sock = accept(iter->first, (struct sockaddr *)&iter->second.address, (socklen_t*)&adrlen);
-        if (conn_sock == -1) {
+        if (conn_sock == -1) 
+        {
             perror("accept");
             exit(EXIT_FAILURE);
         }
 
         mClients[conn_sock].first = iter->second;
         Request req(mClients[conn_sock].first.root[0]);
-
         mClients[conn_sock].second = req;
         std::cout<<"Fd Server :"<<iter->first<<std::endl;
-
         ev.events = EPOLLIN | EPOLLOUT;
         ev.data.fd = conn_sock;
         if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock,&ev) == -1) 
@@ -223,56 +338,13 @@ void ParceConf::Connect_And_Add(int n,const char * hello)
     {
         if (events[n].events & EPOLLIN) 
         {
-            std::cout<<"Enter clinet "<<events[n].data.fd<<" \n";
-            bytesRead = read(events[n].data.fd,buffer,1024);
-            
-            std::cout<<"size :"<<bytesRead<<std::endl;
-            if (bytesRead == -1)
-            {
-                perror("Error read\n");
-                return ;
-            }
-            if (bytesRead == 0) 
-            {
-                close(events[n].data.fd);
-                std::cout<<"Connection closed by client\n"; 
-            }
-            else 
-            {
-
-                
-                std::map<int ,std::pair<Servers,Request> >::iterator iter2 = mClients.find(events[n].data.fd);
-                if (iter2 != mClients.end())
-                {
-                    mClients[events[n].data.fd].second.parce_req(string("").append(buffer,bytesRead));
-                    std::cout<<"requast line path :"<<mClients[events[n].data.fd].second.r_path<<std::endl;
-                    if (mClients[events[n].data.fd].second.r_path.find("/cgi") != std::string::npos)
-                    {
-                        mClients[events[n].data.fd].first.getLocation("/cgi");
-                    }
-                    
-                    
-                }
-            }
+            In_Events(n);
         }
-        // do_use_fd(events[n].data.fd);
         else if (events[n].events & EPOLLOUT && mClients.find(events[n].data.fd) !=  mClients.end()) 
         {
-            // std::cout<<"req done   :_____"<<mClients[events[n].data.fd].req_done()<<std::endl;
-            if (mClients[events[n].data.fd].second.req_done())
-            {
-                
-
-                write(events[n].data.fd ,hello , strlen(hello));
-                close(events[n].data.fd);
-                mClients.erase(events[n].data.fd);
-
-                // std::cout<<"enter in epoluout\n";
-            }
+            Out_Events(n);
         }
     }
-    // std::cout<<"Here for check timeout\n";   
-    // std::cout<<"Here :"<<req.body_state<<std::endl;   
 }
 
 
@@ -285,9 +357,9 @@ void ParceConf::CreatMUltiplex()
     while (std::getline(inputFile, line)) {
         data += line;
     }
-    std::string headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 1000000\r\n\r\n";
-    std::string httprespose = headers + data;
-    const char *hello = httprespose.c_str();
+    // std::string headers = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 1000000\r\n\r\n";
+    // std::string httprespose = headers + data;
+    // const char *hello = httprespose.c_str();
 
     epollfd = epoll_create(255);
     if (epollfd == -1) {
@@ -316,7 +388,7 @@ void ParceConf::CreatMUltiplex()
         
         for (int n = 0; n < nfds ; ++n) 
         {
-            Connect_And_Add(n,hello);
+            Connect_And_Add(n);
         }
     }
 

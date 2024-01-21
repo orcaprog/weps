@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:05 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/01 11:48:41 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/18 15:33:15 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,8 @@ public:
         bool post;
         bool dele;
 
-
+        /*________________Cgi___________________*/
+        std::string getCmdCgi(std::string & exta);
 
 
         
