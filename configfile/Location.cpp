@@ -57,6 +57,27 @@ std::string Location::getCmdCgi(std::string & exta)
     return "";
 }
 
+
+int Location::pathIsFile(std::string path)
+{
+    struct stat fileStat;
+    if (stat(path.c_str(), &fileStat) == 0)
+    {
+        if (fileStat.st_mode & S_IFREG)
+        {
+            return 2;
+        }
+        else if (fileStat.st_mode & S_IFDIR)
+        {
+            return 3;
+        }
+        else
+            return 4;
+    }
+    else
+        return 0;
+}
+
 int Location::pathExists(std::string path) {
     struct stat fileStat;
     return stat(path.c_str(), &fileStat) == 0;
@@ -108,14 +129,35 @@ void Location::SetAllDir()
 {
     FillValid();
     checkValidation();
-
-    
     SetRoot();
     SetAllowMethods();
     SetUpload();
     SetCgiPath();
     SetAutoindex();
+    SetIndex();
     SetPath();
+}
+void Location::SetIndex()
+{
+    int i;
+    int num = checkDup("index", i);
+    std::string arg;
+    if (num == 0)
+    {
+        index.push_back("");
+        return;
+    }
+    if (vlocation[i].size() != 2)
+    {
+        throw "invalid port in of the server_name directive \n";
+    }
+    arg = vlocation[i][1];
+    // std::cout<<"index   :"<<arg<<endl;
+    // if (pathIsFile(arg) != 2 )
+    // {
+    //     throw("Path '" + arg + "' does not exist or is not a file.\n");
+    // }
+    index.push_back(arg);
 }
 void Location::Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data)
 {
@@ -141,6 +183,7 @@ void Location::SetRoot()
     std::string arg;
     if (num == 0)
     {
+        root.push_back("");
         return ;
     }
     if (vlocation[i].size() != 2 )
@@ -174,18 +217,7 @@ void Location::SetPath()
     // }
     path.push_back(arg);
 }
-// void Location::CheckisDup(std::vector<std::string> vec , std::string elemnt)
-// {
-//     std::vector<std::string>::iterator iter ;
-//     int dup = 0;
-    
-//     iter = std::find(vec.begin(),vec.end(),elemnt);
-//     iter = std::find(iter,vec.end(),elemnt);
-//     if (iter == vec.end())
-//     {
-//         throw "Error duplicate methods "+elemnt+" \n";
-//     }
-// }
+
 void Location::CheckMethods(std::string methd)
 {
     std::vector<std::string> allMethds;

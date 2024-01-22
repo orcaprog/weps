@@ -12,39 +12,36 @@
 
 #include "Servers.hpp"
 
-Location & Servers::getLocation(std::string path)
+Location &Servers::getLocation(std::string path)
 {
     size_t i;
     for (i = 0; i < loactions.size(); i++)
     {
-        if(loactions[i].path[0] == path )
+        if (loactions[i].path[0] == path)
         {
             return loactions[i];
         }
-        
     }
     return loactions[i];
 }
-
 
 void Servers::ParceServers()
 {
     std::vector<std::string> vec;
     for (size_t i = 0; i < servconf.size(); i++)
     {
-        if (servconf[i][0] == "server" || servconf[i][0] == "location" ||  servconf[i][0] == "}" ||  servconf[i][0] == "{" )
+        if (servconf[i][0] == "server" || servconf[i][0] == "location" || servconf[i][0] == "}" || servconf[i][0] == "{")
         {
             vec.push_back(servconf[i][0]);
         }
-        
     }
     std::vector<std::string>::iterator iter;
     std::vector<std::string>::iterator loc;
     iter = vec.begin();
     iter++;
-    if(iter != vec.end() && *iter != "{")
+    if (iter != vec.end() && *iter != "{")
     {
-         throw "error no open { for server \n";
+        throw "error no open { for server \n";
     }
     iter++;
     while (iter != vec.end())
@@ -53,22 +50,22 @@ void Servers::ParceServers()
         {
             throw "error no open\n";
         }
-        
+
         if (*iter == "}" && iter + 1 != vec.end())
         {
             throw "error no close here\n";
         }
-        loc = std::find(iter,vec.end(),"location");
-        
+        loc = std::find(iter, vec.end(), "location");
+
         if (loc != vec.end())
         {
             loc++;
-            if (loc != vec.end() && *loc !=  "{")
+            if (loc != vec.end() && *loc != "{")
             {
                 throw "error no open { for location\n";
             }
             loc++;
-            if (loc != vec.end() && *loc !=  "}")
+            if (loc != vec.end() && *loc != "}")
             {
                 throw "error no open } for location\n";
             }
@@ -82,8 +79,28 @@ void Servers::ParceServers()
     }
 }
 
+int Servers::pathIsFile(std::string path)
+{
+    struct stat fileStat;
+    if (stat(path.c_str(), &fileStat) == 0)
+    {
+        if (fileStat.st_mode & S_IFREG)
+        {
+            return 2;
+        }
+        else if (fileStat.st_mode & S_IFDIR)
+        {
+            return 3;
+        }
+        else
+            return 4;
+    }
+    else
+        return 0;
+}
 
-int Servers::pathExists(std::string path) {
+int Servers::pathExists(std::string path)
+{
     struct stat fileStat;
     return stat(path.c_str(), &fileStat) == 0;
 }
@@ -102,16 +119,17 @@ bool Servers::check_isdigit(std::string str)
     return (1);
 }
 
-void Servers::Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data)
+void Servers::Printtwodom(const std::vector<std::vector<std::string> > &matrix, std::string data)
 {
-    for (std::vector<std::vector<std::string> >::const_iterator row = matrix.begin(); row != matrix.end(); ++row) {
-        std::cout<<data<<"   :";
-    for (std::vector<std::string>::const_iterator value = row->begin(); value != row->end(); ++value) {
-        std::cout << *value << "|";
+    for (std::vector<std::vector<std::string> >::const_iterator row = matrix.begin(); row != matrix.end(); ++row)
+    {
+        std::cout << data << "   :";
+        for (std::vector<std::string>::const_iterator value = row->begin(); value != row->end(); ++value)
+        {
+            std::cout << *value << "|";
+        }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
-}
-    
 }
 
 /*_____________________________________________________________*/
@@ -125,24 +143,23 @@ void Servers::parceIp(std::string ip)
     std::string line;
     int net = 0;
     int len = 0;
-    while (getline(ss,line,'.'))
+    while (getline(ss, line, '.'))
     {
-        net = std::atoi(line.c_str()) ;
+        net = std::atoi(line.c_str());
         if (line.size() > 3 || !check_isdigit(line) || net > 255 || net < 0)
         {
-            throw "error invalid ip host "+ip+" \n";
+            throw "error invalid ip host " + ip + " \n";
         }
         len++;
     }
     if (len != 4)
-        throw "error invalid ip host "+ip+" \n";
-
+        throw "error invalid ip host " + ip + " \n";
 }
-int Servers::checkDup(std::string der,int & index)
+int Servers::checkDup(std::string der, int &index)
 {
     int dup = 0;
     size_t i = 0;
-    while ( i < GetIndex("location"))
+    while (i < GetIndex("location"))
     {
         if (servconf[i][0] == der)
         {
@@ -151,30 +168,30 @@ int Servers::checkDup(std::string der,int & index)
         }
         if (dup > 1)
         {
-           throw "Error duplicate derective \n";
+            throw "Error duplicate derective \n";
         }
         i++;
     }
     return (dup);
 }
-void Servers::SetPorts ()
+void Servers::SetPorts()
 {
     int i;
-    int num = checkDup("listen",i);
+    int num = checkDup("listen", i);
     std::string arg;
     if (num == 0)
     {
-        return ;
+        return;
     }
-    if (servconf[i].size() != 2 )
+    if (servconf[i].size() != 2)
     {
-         throw "invalid port in of the listen directive \n";
+        throw "invalid port in of the listen directive \n";
     }
     arg = servconf[i][1];
     int myport = std::atoi(arg.c_str());
-    if (!check_isdigit(arg)  || myport > 65535)
+    if (!check_isdigit(arg) || myport > 65535)
     {
-        throw  ("invalid port in '" + arg + "' of the  directive \n");
+        throw("invalid port in '" + arg + "' of the  directive \n");
     }
     port.push_back(myport);
 }
@@ -182,35 +199,34 @@ void Servers::SetPorts ()
 void Servers::SetServerName()
 {
     int i;
-    int num = checkDup("server_name",i);
+    int num = checkDup("server_name", i);
     std::string arg;
     if (num == 0)
     {
-        return ;
+        return;
     }
-    if (servconf[i].size() != 2 )
+    if (servconf[i].size() != 2)
     {
-         throw "invalid port  directive \n";
+        throw "invalid port  directive \n";
     }
     arg = servconf[i][1];
 
-    //check hna laykon chi check
+    // check hna laykon chi check
     server_name.push_back(arg);
 }
-
 
 void Servers::SetHost()
 {
     int i;
-    int num = checkDup("host",i);
+    int num = checkDup("host", i);
     std::string arg;
     if (num == 0)
     {
-        return ;
+        return;
     }
-    if (servconf[i].size() != 2 )
+    if (servconf[i].size() != 2)
     {
-         throw "invalid host in  directive \n";
+        throw "invalid host in  directive \n";
     }
     arg = servconf[i][1];
     parceIp(arg);
@@ -219,62 +235,64 @@ void Servers::SetHost()
 void Servers::SetRoot()
 {
     int i;
-    int num = checkDup("root",i);
+    int num = checkDup("root", i);
     std::string arg;
     if (num == 0)
     {
-        return ;
+        return;
     }
-    if (servconf[i].size() != 2 )
+    if (servconf[i].size() != 2)
     {
-         throw "invalid root directive \n";
+        throw "invalid root directive \n";
     }
     arg = servconf[i][1];
-    if (!pathExists(arg)) 
+    if (!pathExists(arg))
     {
-        throw ("Path '"+arg+"' does not exist.\n");
+        throw("Path '" + arg + "' does not exist.\n");
     }
     root.push_back(arg);
 }
 void Servers::SetIndex()
 {
     int i;
-    int num = checkDup("index",i);
+    int num = checkDup("index", i);
     std::string arg;
     if (num == 0)
     {
-        return ;
+        index.push_back("");
+        return;
     }
-    if (servconf[i].size() != 2 )
+    if (servconf[i].size() != 2)
     {
-         throw "invalid port in of the server_name directive \n";
+        throw "invalid port in of the server_name directive \n";
     }
     arg = servconf[i][1];
-    if (!pathExists(arg)) 
-    {
-       throw ("Path '"+arg+"' does not exist.\n");
-    }
+    // std::cout<<"index   :"<<arg<<endl;
+    // if (pathIsFile(arg) != 2 )
+    // {
+    //     throw("Path '" + arg + "' does not exist or is not a file.\n");
+    // }
     index.push_back(arg);
 }
 void Servers::SetClient_max_body_size()
 {
     int i;
-    int num = checkDup("client_max_body_size",i);
+    int num = checkDup("client_max_body_size", i);
     std::string arg;
     if (num == 0)
     {
-        return ;
+        return;
     }
-    if (servconf[i].size() != 2 )
+    if (servconf[i].size() != 2)
     {
-         throw "invalid client_max_body_size  directive \n";
+        throw "invalid client_max_body_size  directive \n";
     }
     arg = servconf[i][1];
-    long long int  body_size = std::strtod(arg.c_str(),NULL);
+    long long int body_size = std::strtod(arg.c_str(), NULL);
     if (!check_isdigit(arg))
     {
-        throw  "invalid port in '"+ arg +"' of the  directive \n";
-    }   
+        throw "invalid port in '" + arg + "' of the  directive \n";
+    }
     client_max_body_size.push_back(body_size);
 }
 
@@ -282,13 +300,13 @@ void Servers::check_Status(std::string status)
 {
     std::vector<std::string>::iterator iter;
 
-    iter = std::find(s_erorr.begin(),s_erorr.end(),status);
+    iter = std::find(s_erorr.begin(), s_erorr.end(), status);
     if (iter == s_erorr.end())
     {
-        throw "Error : Invalid status '"+status +"' code  Derecties\n";
+        throw "Error : Invalid status '" + status + "' code  Derecties\n";
     }
 }
-std::vector<std::string>  Servers::AddErrorPage(std::string status,std::string path)
+std::vector<std::string> Servers::AddErrorPage(std::string status, std::string path)
 {
     std::vector<std::string> vErrorPage;
     vErrorPage.push_back(status);
@@ -296,18 +314,16 @@ std::vector<std::string>  Servers::AddErrorPage(std::string status,std::string p
 
     return vErrorPage;
 }
-void Servers::ReplacePath(std::string status,std::string path)
+void Servers::ReplacePath(std::string status, std::string path)
 {
     for (size_t i = 0; i < error_page.size(); i++)
     {
         if (error_page[i][0] == status)
         {
             error_page[i][1] = path;
-            return ;
+            return;
         }
-        
     }
-    
 }
 void Servers::SetError_page()
 {
@@ -324,11 +340,11 @@ void Servers::SetError_page()
             status = servconf[i][1];
             path = servconf[i][2];
             check_Status(status);
-            if (!pathExists(path)) 
+            if (!pathExists(path))
             {
-                throw ("Path '"+path+"' does not exist.\n");
+                throw("Path '" + path + "' does not exist.\n");
             }
-            ReplacePath(status,path);
+            ReplacePath(status, path);
         }
     }
 }
@@ -340,8 +356,7 @@ void Servers::SetAllDir()
     FillStatus();
     FillLocation();
     checkValidation();
-    
-     
+
     SetHost();
     SetRoot();
     SetPorts();
@@ -349,55 +364,52 @@ void Servers::SetAllDir()
     SetServerName();
     SetError_page();
     SetClient_max_body_size();
-    
+
     size_t i = 0;
     while (i < loactions.size())
     {
         loactions[i].SetAllDir();
         i++;
     }
-    
 }
 /*_____________________________________________________________*/
 /*_________________________GET_________________________________*/
 /*_____________________________________________________________*/
 
-const std::vector<int> & Servers::GetPorts ()
+const std::vector<int> &Servers::GetPorts()
 {
     return port;
 }
-const std::vector<std::string> & Servers::GetServerName()
+const std::vector<std::string> &Servers::GetServerName()
 {
-    return server_name ;
-} 
-const std::vector<std::string> & Servers::GetHost()
+    return server_name;
+}
+const std::vector<std::string> &Servers::GetHost()
 {
     return host;
 }
-const std::vector<std::string> & Servers::GetRoot()
+const std::vector<std::string> &Servers::GetRoot()
 {
     return root;
 }
-const std::vector<std::vector<std::string> >&  Servers::GetError_page()
+const std::vector<std::vector<std::string> > &Servers::GetError_page()
 {
     return error_page;
 }
-const std::vector<long long int > &  Servers::GetClient_max_body_size()
+const std::vector<long long int> &Servers::GetClient_max_body_size()
 {
     return client_max_body_size;
 }
-const std::vector<std::string> & Servers::GetIndex()
+const std::vector<std::string> &Servers::GetIndex()
 {
     return index;
 }
-
-
 
 /*=======================================================================*/
 /*=======================================================================*/
 size_t Servers::GetIndex(std::string dir)
 {
-    size_t i ;
+    size_t i;
     for (i = 0; i < servconf.size(); i++)
     {
         if (servconf[i][0] == dir)
@@ -407,7 +419,7 @@ size_t Servers::GetIndex(std::string dir)
     }
     return (i);
 }
-Location Servers::FirstFill(size_t & index)
+Location Servers::FirstFill(size_t &index)
 {
     Location loaction;
     loaction.vlocation.push_back(servconf[index]);
@@ -421,14 +433,13 @@ Location Servers::FirstFill(size_t & index)
     return loaction;
 }
 
-
 void Servers::FillLocation()
 {
     size_t index = GetIndex("location");
 
     if (index == servconf.size())
     {
-        return ;
+        return;
     }
     while (index < servconf.size())
     {
@@ -480,77 +491,75 @@ void Servers::FillStatus()
     s_erorr.push_back("508");
     s_erorr.push_back("510");
     s_erorr.push_back("511");
-
 }
 void Servers::FillValid()
 {
-     Vstrvalid.push_back("listen");
-     Vstrvalid.push_back("server");
-     Vstrvalid.push_back("server_name");
-     Vstrvalid.push_back("host");
-     Vstrvalid.push_back("root");
-     Vstrvalid.push_back("error_page");
-     Vstrvalid.push_back("client_max_body_size");
-     Vstrvalid.push_back("index");
-     Vstrvalid.push_back("location");
-     Vstrvalid.push_back("{");
-     Vstrvalid.push_back("}");
-     Vstrvalid.push_back("#");
-     Vstrvalid.push_back("allow_methods");
-     Vstrvalid.push_back("autoindex");
-     Vstrvalid.push_back("upload");
-     Vstrvalid.push_back("cgi_path");
+    Vstrvalid.push_back("listen");
+    Vstrvalid.push_back("server");
+    Vstrvalid.push_back("server_name");
+    Vstrvalid.push_back("host");
+    Vstrvalid.push_back("root");
+    Vstrvalid.push_back("error_page");
+    Vstrvalid.push_back("client_max_body_size");
+    Vstrvalid.push_back("index");
+    Vstrvalid.push_back("location");
+    Vstrvalid.push_back("{");
+    Vstrvalid.push_back("}");
+    Vstrvalid.push_back("#");
+    Vstrvalid.push_back("allow_methods");
+    Vstrvalid.push_back("autoindex");
+    Vstrvalid.push_back("upload");
+    Vstrvalid.push_back("cgi_path");
 }
 void Servers::checkValidation()
 {
     std::vector<std::string>::iterator iter;
     for (size_t i = 0; i < GetIndex("location"); i++)
     {
-        iter = std::find(Vstrvalid.begin(),Vstrvalid.end(),servconf[i][0]);
+        iter = std::find(Vstrvalid.begin(), Vstrvalid.end(), servconf[i][0]);
         if (iter == Vstrvalid.end())
         {
             throw "Error : Invalid Derecties\n";
         }
     }
-    
 }
 
 void Servers::desplay()
 {
     // std::vector<std::vector<std::string> > matrix = servconf;
-    
-Print_dirs(GetPorts().begin(),GetPorts().end(),"Ports");
-Print_dirs(GetServerName().begin(),GetServerName().end(),"Server_name");
-Print_dirs(GetHost().begin(),GetHost().end(),"Host");
-Print_dirs(GetRoot().begin(),GetRoot().end(),"Root");
-Printtwodom(GetError_page(),"Error_page");
-Print_dirs(GetClient_max_body_size().begin(),GetClient_max_body_size().end(),"Client_max_body_size");
-Print_dirs(GetIndex().begin(),GetIndex().end(),"Index");
-size_t i = 0;
-while (i < loactions.size())
-{
-    std::cout<<"________________________\n";
-    loactions[i].desplayLocation();
-    i++;
-}
-   
+
+    Print_dirs(GetPorts().begin(), GetPorts().end(), "Ports");
+    Print_dirs(GetServerName().begin(), GetServerName().end(), "Server_name");
+    Print_dirs(GetHost().begin(), GetHost().end(), "Host");
+    Print_dirs(GetRoot().begin(), GetRoot().end(), "Root");
+    Printtwodom(GetError_page(), "Error_page");
+    Print_dirs(GetClient_max_body_size().begin(), GetClient_max_body_size().end(), "Client_max_body_size");
+    Print_dirs(GetIndex().begin(), GetIndex().end(), "Index");
+    size_t i = 0;
+    while (i < loactions.size())
+    {
+        std::cout << "________________________\n";
+        loactions[i].desplayLocation();
+        i++;
+    }
 }
 
 /*#############################################################*/
-                     /*CREATE SOKCET*/
+/*CREATE SOKCET*/
 /*#############################################################*/
 
 void Servers::CreatSocketServer()
 {
-    
-    if ((server_fd = socket(AF_INET , SOCK_STREAM,0) )< 0)
+
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         perror("connot create socket");
-        return ;
+        return;
     }
 
     int reuseaddr = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(int)) == -1) {
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(int)) == -1)
+    {
         perror("setsockopt");
         close(server_fd);
         exit(EXIT_FAILURE);
@@ -558,30 +567,29 @@ void Servers::CreatSocketServer()
 
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( port[0] );
+    address.sin_port = htons(port[0]);
     memset(address.sin_zero, '\0', sizeof address.sin_zero);
-    if (bind(server_fd,(struct sockaddr *)&address,sizeof(address)) < 0) 
-    { 
-        perror("bind failed"); 
-        return ; 
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
+    {
+        perror("bind failed");
+        return;
     }
     if (listen(server_fd, 3) < 0)
-    { 
+    {
         perror("“In listen”");
         exit(EXIT_FAILURE);
     }
-
 }
 /*#############################################################*/
 void Servers::SetDefaultError()
 {
-    error_page.push_back(AddErrorPage("400","400.html"));
-    error_page.push_back(AddErrorPage("401","401.html"));
-    error_page.push_back(AddErrorPage("402","402.html"));
-    error_page.push_back(AddErrorPage("403","403.html"));
-    error_page.push_back(AddErrorPage("404","404.html"));
-    error_page.push_back(AddErrorPage("405","405.html"));
-    error_page.push_back(AddErrorPage("406","406.html"));
+    error_page.push_back(AddErrorPage("400", "400.html"));
+    error_page.push_back(AddErrorPage("401", "401.html"));
+    error_page.push_back(AddErrorPage("402", "402.html"));
+    error_page.push_back(AddErrorPage("403", "403.html"));
+    error_page.push_back(AddErrorPage("404", "404.html"));
+    error_page.push_back(AddErrorPage("405", "405.html"));
+    error_page.push_back(AddErrorPage("406", "406.html"));
     // error_page.push_back(AddErrorPage("407","407.html"));
     // error_page.push_back(AddErrorPage("408","408.html"));
     // error_page.push_back(AddErrorPage("409","409.html"));
@@ -616,13 +624,104 @@ void Servers::SetDefaultError()
     // error_page.push_back(AddErrorPage("510","510.html"));
     // error_page.push_back(AddErrorPage("511","511.html"));
 }
+int Servers::searchPathLocation(string &uri)
+{
+    size_t pos;
+    std::cout << "uri   :" << uri << endl;
+    for (size_t i = 0; i < loactions.size(); i++)
+    {
+        std::cout << "path location :" << loactions[i].path[0] << endl;
+        pos = uri.find(loactions[i].path[0]);
+        std::cout << "pos :" << pos << endl;
+        if (pos != string::npos && pos == 0 && loactions[i].path[0] != "/")
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void Servers::fillFromLocation(int &in, string &uri)
+{
+    // size_t pos;
+
+    if (loactions[in].root[0].empty())
+    {
+        rootUri = uri;
+        rootUri.replace(0, loactions[in].path[0].length(), root[0]);
+        if (!pathExists(rootUri))
+        {
+            // throw "Erorr in " + rootUri + ": no such file or directory";
+            cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
+            return;
+        }
+    }
+    else
+    {
+        rootUri = uri;
+        rootUri.replace(0, loactions[in].path[0].length(), loactions[in].root[0]);
+        if (pathIsFile(rootUri) != 2)
+        {
+            if (loactions[in].index[0].empty())
+            {
+                rootUri += ("/" + index[0]);
+            }
+            else
+            {
+                rootUri += ("/" + loactions[in].index[0]);
+            }
+        }
+        if (!pathExists(rootUri))
+        {
+            // throw "Erorr in " + rootUri + ": no such file or directory";
+            cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
+            return;
+        }
+        
+    }
+}
+void Servers::FillData(string uri)
+{
+    int in = searchPathLocation(uri);
+    string LocationIndex;
+    std::cout << "in :" << in << endl;
+    if (in == -1)
+    {
+        cout << root[0] << endl;
+        rootUri = root[0] + uri;
+        std::cout << "root URI -1 :" << rootUri << endl;
+        if (pathIsFile(rootUri) != 2)
+        {
+            LocationIndex = getLocation("/").index[0];
+            std::cout<<"/ loactaion index :"<<LocationIndex<<endl;
+            if (LocationIndex.empty())
+            {
+                rootUri += ("/" + index[0]);
+            }
+            else
+            {
+                rootUri += ("/" + LocationIndex);
+            }
+        }
+        if (!pathExists(rootUri))
+        {
+            // throw "Erorr in " + rootUri + ": no such file or directory";
+            cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
+            return;
+        }
+    }
+    else
+    {
+        fillFromLocation(in, uri);
+    }
+}
+
 Servers::Servers()
 {
+    // root.push_back("");
     SetDefaultError();
-    
 }
 
 Servers::~Servers()
 {
-    
 }

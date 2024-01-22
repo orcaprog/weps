@@ -23,6 +23,7 @@
 #include <deque>
 #include <map>
 #include <sys/stat.h>
+using namespace std;
 class Location
 {
 private:
@@ -34,10 +35,12 @@ private:
         size_t GetIndex(std::string dir);
         int  checkDup(std::string der,int & index);
 
+    int pathIsFile(std::string path);
+    
         void FillValid();
         void checkValidation();
         std::vector<std::string> Vstrvalid;
-
+        void SetIndex();
         void SetPath();
         void SetAllowMethods();
         void SetAutoindex();
@@ -49,6 +52,7 @@ private:
 public:
         std::vector<std::string> path;
         std::vector<std::string> root;
+        std::vector<std::string> index;
         std::vector<std::string >  allow_methods;
         bool autoindex ;
         bool upload;

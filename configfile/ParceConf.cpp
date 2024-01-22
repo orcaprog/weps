@@ -289,6 +289,10 @@ void ParceConf::In_Events(int n)
         {
             
             mClients[events[n].data.fd].second.process_req(string("").append(buffer, bytesRead),bytesRead,EPOLLIN);
+            mClients[events[n].data.fd].first.FillData(mClients[events[n].data.fd].second.r_path);
+            cout<<"rootUri :"<<mClients[events[n].data.fd].first.rootUri<<endl;
+
+
             if (mClients[events[n].data.fd].second.r_path == "/favicon.ico")
             {
                 epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);

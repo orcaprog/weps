@@ -30,6 +30,7 @@
 #include <sys/stat.h>
 #include "Location.hpp"
 #include <stack>
+
 class Servers
 {
 private:
@@ -43,14 +44,14 @@ private:
     void FillValid();
     void checkValidation();
     void parceIp(std::string ip);
-    int  pathExists(std::string path);
     void check_Status(std::string status);
 
-    
+    int  pathExists(std::string path);
+
+    int pathIsFile(std::string path);
     size_t GetIndex(std::string dir);
     
     Location FirstFill(size_t & index);
-    void FillLocation();
     
     void SetPorts (); // done ~
     void SetServerName(); // done ~
@@ -100,6 +101,9 @@ public:
     const std::vector<std::vector<std::string> >&  GetError_page(); 
     const std::vector<long long int > &  GetClient_max_body_size(); 
     const std::vector<std::string> & GetIndex(); 
+
+
+
     template<typename T,typename V>
     void Print_dirs(T begin,T end,V data)
     {
@@ -111,9 +115,17 @@ public:
     }
     Location & getLocation(std::string);
     void SetDefaultError();
-
     void CreatSocketServer();
     Servers();
+
+    /*====================================*/
+    int searchPathLocation(string & uri);
+    void fillFromLocation(int & index,string & uri);
+    void FillData(string  uri);
+    string rootUri;
+    /*====================================*/
+    void FillLocation();
+
     ~Servers();
 };
 
