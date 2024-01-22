@@ -627,12 +627,9 @@ void Servers::SetDefaultError()
 int Servers::searchPathLocation(string &uri)
 {
     size_t pos;
-    std::cout << "uri   :" << uri << endl;
     for (size_t i = 0; i < loactions.size(); i++)
     {
-        std::cout << "path location :" << loactions[i].path[0] << endl;
         pos = uri.find(loactions[i].path[0]);
-        std::cout << "pos :" << pos << endl;
         if (pos != string::npos && pos == 0 && loactions[i].path[0] != "/")
         {
             return i;
@@ -684,16 +681,12 @@ void Servers::FillData(string uri)
 {
     int in = searchPathLocation(uri);
     string LocationIndex;
-    std::cout << "in :" << in << endl;
     if (in == -1)
     {
-        cout << root[0] << endl;
         rootUri = root[0] + uri;
-        std::cout << "root URI -1 :" << rootUri << endl;
         if (pathIsFile(rootUri) != 2)
         {
             LocationIndex = getLocation("/").index[0];
-            std::cout<<"/ loactaion index :"<<LocationIndex<<endl;
             if (LocationIndex.empty())
             {
                 rootUri += ("/" + index[0]);
