@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 18:04:44 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/23 19:02:42 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/24 18:08:16 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 Multiplexing::Multiplexing(std::string  configfile)
 {
     server.TakeAndParce(configfile);
+    
     fd = -2;
 }
 
@@ -135,7 +136,9 @@ void Multiplexing::In_Events(int n)
             cout<<"rootUri :"<<mClients[events[n].data.fd].first.rootUri<<endl;
             cout<<"is_cgi :"<<mClients[events[n].data.fd].first.Is_cgi<<endl;
 
-
+            cout<<"===============================================\n";
+            mClients[events[n].data.fd].first.UriLocation.desplayLocation();
+            cout<<"===============================================\n";
             // if (mClients[events[n].data.fd].second.r_path == "/favicon.ico")
             // {
             //     epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);

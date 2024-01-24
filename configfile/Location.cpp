@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:03 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/23 11:15:51 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/24 17:30:16 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void Location::desplayLocation()
 {
 
     // Printtwodom(vlocation,"location");
-    cout<<"PATH :"<<GetPath()<<endl;
+    cout<<"PATH :"<<path[0]<<endl;
     cout<<"AllowMethods :"<<GetAllowMethods()<<endl;
     cout<<"Root :"<<GetRoot()<<endl;
     Printtwodom(GetCgiPath(),"GetCgiPath");
@@ -204,6 +204,7 @@ void Location::SetPath()
     std::string arg;
     if (num == 0)
     {
+        path.push_back("");
         return ;
     }
     if (vlocation[i].size() != 2 )
@@ -253,6 +254,8 @@ void Location::SetAllowMethods()
     std::vector<std::string> vallow;
     if (num == 0)
     {
+        
+        allow_methods.push_back("");
         return ;
     }
     if (vlocation[i].size() > 4 || vlocation[i].size() < 2 )
@@ -279,6 +282,7 @@ void Location::SetAutoindex()
     std::string arg;
     if (num == 0)
     {
+        autoindex = 0;
         return ;
     }
     if (vlocation[i].size() != 2 )
@@ -302,6 +306,7 @@ void Location::SetUpload()
     std::string arg;
     if (num == 0)
     {
+        upload = 0;
         return ;
     }
     if (vlocation[i].size() != 2 )

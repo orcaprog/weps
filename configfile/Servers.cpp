@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/24 14:32:10 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/24 18:05:41 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,59 +25,6 @@ int  Servers::getLocation(std::string path)
     return -1;
 }
 
-void Servers::ParceServers()
-{
-    std::vector<std::string> vec;
-    for (size_t i = 0; i < servconf.size(); i++)
-    {
-        if (servconf[i][0] == "server" || servconf[i][0] == "location" || servconf[i][0] == "}" || servconf[i][0] == "{")
-        {
-            vec.push_back(servconf[i][0]);
-        }
-    }
-    std::vector<std::string>::iterator iter;
-    std::vector<std::string>::iterator loc;
-    iter = vec.begin();
-    iter++;
-    if (iter != vec.end() && *iter != "{")
-    {
-        throw "error no open { for server \n";
-    }
-    iter++;
-    while (iter != vec.end())
-    {
-        if (*iter == "{")
-        {
-            throw "error no open\n";
-        }
-
-        if (*iter == "}" && iter + 1 != vec.end())
-        {
-            throw "error no close here\n";
-        }
-        loc = std::find(iter, vec.end(), "location");
-
-        if (loc != vec.end())
-        {
-            loc++;
-            if (loc != vec.end() && *loc != "{")
-            {
-                throw "error no open { for location\n";
-            }
-            loc++;
-            if (loc != vec.end() && *loc != "}")
-            {
-                throw "error no open } for location\n";
-            }
-            loc++;
-            if (loc == vec.end() || (*loc == "}" && loc + 1 != vec.end()))
-            {
-                throw "error for closeb\n";
-            }
-        }
-        iter = loc;
-    }
-}
 
 int Servers::pathIsFile(std::string path)
 {
@@ -181,6 +128,7 @@ void Servers::SetPorts()
     std::string arg;
     if (num == 0)
     {
+        port.push_back(0);
         return;
     }
     if (servconf[i].size() != 2)
@@ -203,6 +151,7 @@ void Servers::SetServerName()
     std::string arg;
     if (num == 0)
     {
+        server_name.push_back("");
         return;
     }
     if (servconf[i].size() != 2)
@@ -222,6 +171,8 @@ void Servers::SetHost()
     std::string arg;
     if (num == 0)
     {
+        host.push_back("");
+        
         return;
     }
     if (servconf[i].size() != 2)
@@ -239,6 +190,7 @@ void Servers::SetRoot()
     std::string arg;
     if (num == 0)
     {
+        root.push_back("");
         return;
     }
     if (servconf[i].size() != 2)
@@ -281,6 +233,7 @@ void Servers::SetClient_max_body_size()
     std::string arg;
     if (num == 0)
     {
+        client_max_body_size.push_back(0);
         return;
     }
     if (servconf[i].size() != 2)
@@ -351,7 +304,7 @@ void Servers::SetError_page()
 
 void Servers::SetAllDir()
 {
-    ParceServers();
+    // ParceServers();
     FillValid();
     FillStatus();
     FillLocation();
@@ -683,35 +636,41 @@ void Servers::FillData(string uri)
 {
     int in = searchPathLocation(uri);
     Is_cgi = false;
+    int def = 0;
     string LocationIndex;
     if (in == -1)
     {
-        rootUri = root[0] + uri;
-        if (pathIsFile(rootUri) != 2)
+
+        def = getLocation("/");
+        if (def != -1)
         {
-            int k = getLocation("/");
-            if (k != -1)
+            if (locations[def].root[0].empty())
             {
-                std::cout<<"K :"<<k<<endl;
-                LocationIndex = locations[k].index[0];
-                if (!locations[k].root[0].empty())
-                    rootUri = locations[k].root[0] + uri;
+                rootUri = root[0] + uri;
+            }
+            else 
+                rootUri = locations[def].root[0] + uri;
+
+            if (pathIsFile(rootUri) != 2)
+            {
+                LocationIndex = locations[def].index[0];
                 if (LocationIndex.empty())
                     rootUri += ("/" + index[0]);
                 else
                     rootUri += ("/" + LocationIndex);
-                UriLocation = locations[k];
             }
-            else
-                rootUri += ("/" + index[0]);
+            UriLocation = locations[def];
+            if (!pathExists(rootUri))
+            {
+                // throw "Erorr in " + rootUri + ": no such file or directory";
+                cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
+                return;
+            }
         }
-        if (!pathExists(rootUri))
+        else
         {
-            // throw "Erorr in " + rootUri + ": no such file or directory";
-            cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
-            return;
+            rootUri = root[0] +uri;
         }
-        
     }
     else
     {
