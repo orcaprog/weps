@@ -1,8 +1,0 @@
-Content-type: text/html; charset=UTF-8
-
-<!doctype html>
-<html>
-  <body>
-    <p> Welcom to Dachboard</p>
-</body>
-</html>

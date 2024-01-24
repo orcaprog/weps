@@ -1,6 +1,6 @@
-NAME = parce
+NAME = webserv
 
-SRC = main.cpp  ParceConf.cpp Servers.cpp Location.cpp Cgi.cpp \
+SRC = main.cpp  ParceConf.cpp Servers.cpp Location.cpp Cgi.cpp  Multiplexing.cpp\
 	  ../elidrys/src/Request.cpp\
 	  ../elidrys/src/Get.cpp\
 	  ../elidrys/src/Method.cpp\

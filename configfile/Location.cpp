@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:03 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/18 15:32:42 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/23 11:15:51 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,9 +118,9 @@ void Location::desplayLocation()
 {
 
     // Printtwodom(vlocation,"location");
-    Print_dirs(GetPath().begin(),GetPath().end(),"Path");
-    Print_dirs(GetAllowMethods().begin(),GetAllowMethods().end(),"AllowMethods");
-    Print_dirs(GetRoot().begin(),GetRoot().end(),"Root");
+    cout<<"PATH :"<<GetPath()<<endl;
+    cout<<"AllowMethods :"<<GetAllowMethods()<<endl;
+    cout<<"Root :"<<GetRoot()<<endl;
     Printtwodom(GetCgiPath(),"GetCgiPath");
     std::cout<<"upload  :"<<GetUpload()<<std::endl;
     std::cout<<"Autoindex  :"<<GetAutoindex()<<std::endl;
@@ -366,30 +366,29 @@ void Location::SetCgiPath()
 /*__________________________________________*/
 /*__________________________________________*/
 /*__________________________________________*/
-
-const std::vector<std::string> & Location::GetPath()
+ std::string & Location::GetPath()
 {
-    return path;
+    return path[0];
 }
-const std::vector<std::string> & Location::GetAllowMethods()
+ std::string  & Location::GetAllowMethods()
 {
-    return allow_methods;
+    return allow_methods[0];
 }
-const bool & Location::GetAutoindex()
+ bool & Location::GetAutoindex()
 {
     return autoindex;
 }
-const bool & Location::GetUpload()
+ bool & Location::GetUpload()
 {
     return upload;
 }
-const std::vector< std::vector<std::string> > & Location::GetCgiPath()
+ std::vector< std::vector<std::string> > & Location::GetCgiPath()
 {
     return cgi_path;
 }
-const std::vector<std::string> & Location::GetRoot()
+std::string & Location::GetRoot()
 {
-    return root;
+    return root[0];
 }
 
 Location::Location()

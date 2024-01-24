@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:42:27 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/06 16:56:47 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/23 18:53:55 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,41 +88,33 @@ public:
     //________________________//
     //________loaction________//
     
-    std::vector<Location> loactions;
+    std::vector<Location> locations;
 
     //________________________//
     void SetAllDir();
     void desplay();
     
-    const std::vector<int> & GetPorts (); 
-    const std::vector<std::string> & GetServerName(); 
-    const std::vector<std::string> & GetHost();  
-    const std::vector<std::string> & GetRoot();  
+    const int & GetPorts (); 
+    const std::string & GetServerName(); 
+    const std::string & GetHost();  
+    const std::string & GetRoot();  
     const std::vector<std::vector<std::string> >&  GetError_page(); 
-    const std::vector<long long int > &  GetClient_max_body_size(); 
-    const std::vector<std::string> & GetIndex(); 
+    const long long int  &  GetClient_max_body_size(); 
+    const std::string & GetIndex(); 
 
-
-
-    template<typename T,typename V>
-    void Print_dirs(T begin,T end,V data)
-    {
-        while(begin != end)
-        {
-            std::cout<<data<<"  :"<<*begin<<std::endl;
-            begin++;
-        }
-    }
-    Location & getLocation(std::string);
+    int getLocation(std::string path);
     void SetDefaultError();
     void CreatSocketServer();
     Servers();
 
     /*====================================*/
     int searchPathLocation(string & uri);
-    void fillFromLocation(int & index,string & uri);
+    int fillFromLocation(int & index,string & uri);
     void FillData(string  uri);
     string rootUri;
+    bool Is_cgi;
+    void checkIsCgi(string uri);
+    Location UriLocation;
     /*====================================*/
     void FillLocation();
 
