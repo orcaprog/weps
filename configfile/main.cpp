@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:36:57 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/24 17:24:23 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/24 18:42:50 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int main(int ac , char **av)
         Multiplexing mult(av[1]);
         mult.CreatMUltiplex();
         // ParceConf server;   
-        // server.TakeAndParce(av[1]);
+        // server.TakeAndParse(av[1]);
         // server.CreatMUltiplex();        
     }
     catch(std::string  e)
