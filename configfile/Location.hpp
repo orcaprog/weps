@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:05 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/23 11:19:37 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/25 15:11:42 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ public:
         std::vector<std::string >  allow_methods;
         bool autoindex ;
         bool upload;
-        std::vector<std::vector<std::string > >  cgi_path;
+        map<string ,string> cgi_path;
         bool get;
         bool post;
         bool dele;
@@ -70,6 +70,7 @@ public:
         bool & GetUpload();
         std::vector<std::vector<std::string> > & GetCgiPath();
         std::string & GetRoot();
+        std::string & GetindexLocation();
         
         std::vector<std::vector<std::string> > vlocation;
 

@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/24 18:05:41 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/25 20:13:35 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,17 +267,7 @@ std::vector<std::string> Servers::AddErrorPage(std::string status, std::string p
 
     return vErrorPage;
 }
-void Servers::ReplacePath(std::string status, std::string path)
-{
-    for (size_t i = 0; i < error_page.size(); i++)
-    {
-        if (error_page[i][0] == status)
-        {
-            error_page[i][1] = path;
-            return;
-        }
-    }
-}
+
 void Servers::SetError_page()
 {
     std::string status;
@@ -293,11 +283,17 @@ void Servers::SetError_page()
             status = servconf[i][1];
             path = servconf[i][2];
             check_Status(status);
-            if (!pathExists(path))
+            if(pathIsFile(path) == 2)
+                error_page[status] = path;
+            else
             {
-                throw("Path '" + path + "' does not exist.\n");
+                path = root[0] +"/"+path;
+                if (pathIsFile(path) != 2)
+                {
+                    throw "path is not file or nosush file '"+path+"'\n";
+                }
+                error_page[status] = path;
             }
-            ReplacePath(status, path);
         }
     }
 }
@@ -345,10 +341,7 @@ const std::string &Servers::GetRoot()
 {
     return root[0];
 }
-const std::vector<std::vector<std::string> > &Servers::GetError_page()
-{
-    return error_page;
-}
+
 const long long int &Servers::GetClient_max_body_size()
 {
     return client_max_body_size[0];
@@ -485,7 +478,13 @@ void Servers::desplay()
     cout<<"ServerName  :"<<GetServerName()<<endl;
     cout<<"Host :"<<GetHost()<<endl;
     cout<<"Root :"<<GetRoot()<<endl;
-    Printtwodom(GetError_page(), "Error_page");
+    map<string,string>::iterator iter = error_page.begin();
+    while (iter != error_page.end())
+    {
+        cout<<"error Page :'"<<iter->first<<"' '"<<iter->second<<"'\n";
+        iter++;
+    }
+    
     cout<<"Client_max_body_size :"<<endl;
     cout<<"Index :"<<GetIndex()<<endl;
     size_t i = 0;
@@ -536,54 +535,22 @@ void Servers::CreatSocketServer()
 /*#############################################################*/
 void Servers::SetDefaultError()
 {
-    error_page.push_back(AddErrorPage("400", "400.html"));
-    error_page.push_back(AddErrorPage("401", "401.html"));
-    error_page.push_back(AddErrorPage("402", "402.html"));
-    error_page.push_back(AddErrorPage("403", "403.html"));
-    error_page.push_back(AddErrorPage("404", "404.html"));
-    error_page.push_back(AddErrorPage("405", "405.html"));
-    error_page.push_back(AddErrorPage("406", "406.html"));
-    // error_page.push_back(AddErrorPage("407","407.html"));
-    // error_page.push_back(AddErrorPage("408","408.html"));
-    // error_page.push_back(AddErrorPage("409","409.html"));
-    // error_page.push_back(AddErrorPage("410","410.html"));
-    // error_page.push_back(AddErrorPage("411","411.html"));
-    // error_page.push_back(AddErrorPage("412","412.html"));
-    // error_page.push_back(AddErrorPage("413","413.html"));
-    // error_page.push_back(AddErrorPage("414","414.html"));
-    // error_page.push_back(AddErrorPage("415","415.html"));
-    // error_page.push_back(AddErrorPage("416","416.html"));
-    // error_page.push_back(AddErrorPage("417","417.html"));
-    // error_page.push_back(AddErrorPage("418","418.html"));
-    // error_page.push_back(AddErrorPage("421","421.html"));
-    // error_page.push_back(AddErrorPage("422","422.html"));
-    // error_page.push_back(AddErrorPage("423","423.html"));
-    // error_page.push_back(AddErrorPage("424","424.html"));
-    // error_page.push_back(AddErrorPage("425","425.html"));
-    // error_page.push_back(AddErrorPage("426","426.html"));
-    // error_page.push_back(AddErrorPage("428","428.html"));
-    // error_page.push_back(AddErrorPage("429","429.html"));
-    // error_page.push_back(AddErrorPage("431","431.html"));
-    // error_page.push_back(AddErrorPage("451","451.html"));
-    // error_page.push_back(AddErrorPage("500","500.html"));
-    // error_page.push_back(AddErrorPage("501","501.html"));
-    // error_page.push_back(AddErrorPage("502","502.html"));
-    // error_page.push_back(AddErrorPage("503","503.html"));
-    // error_page.push_back(AddErrorPage("504","504.html"));
-    // error_page.push_back(AddErrorPage("505","505.html"));
-    // error_page.push_back(AddErrorPage("506","506.html"));
-    // error_page.push_back(AddErrorPage("507","507.html"));
-    // error_page.push_back(AddErrorPage("508","508.html"));
-    // error_page.push_back(AddErrorPage("510","510.html"));
-    // error_page.push_back(AddErrorPage("511","511.html"));
+    error_page["400"] =  "../error_pages/400.html";
+    error_page["401"] =  "../error_pages/401.html";
+    error_page["402"] =  "../error_pages/402.html";
+    error_page["403"] =  "../error_pages/403.html";
+    error_page["404"] =  "../error_pages/404.html";
+    error_page["405"] =  "../error_pages/405.html";
+    error_page["406"] =  "../error_pages/406.html";
+    
 }
 int Servers::searchPathLocation(string &uri)
 {
-    size_t pos;
+    string pathL;
     for (size_t i = 0; i < locations.size(); i++)
     {
-        pos = uri.find(locations[i].path[0]);
-        if (pos != string::npos && pos == 0 && locations[i].path[0] != "/")
+        pathL =  locations[i].path[0] ;
+        if (!strncmp(uri.c_str(),pathL.c_str(),pathL.length())  && pathL != "/")
         {
             return i;
         }
@@ -593,24 +560,24 @@ int Servers::searchPathLocation(string &uri)
 
 int  Servers::fillFromLocation(int &in, string &uri)
 {
-    // size_t pos;
-
+    size_t pos;
+    pos = uri.find("?");
+    int len;
+    
+    if (pos != std::string::npos)
+    {
+        len = uri.length() - pos;
+        char q[len + 1];
+        uri.copy(q,len,pos);
+        q[len] = '\0';
+        querys = q;
+        uri.erase(pos,len);
+    }
     if (locations[in].root[0].empty())
     {
         rootUri = uri;
         rootUri.replace(0, locations[in].path[0].length(), root[0]);
-        if (!pathExists(rootUri))
-        {
-            // throw "Erorr in " + rootUri + ": no such file or directory";
-            cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
-            return 0;
-        }
-    }
-    else
-    {
-        rootUri = uri;
-        rootUri.replace(0, locations[in].path[0].length(), locations[in].root[0]);
-        if (pathIsFile(rootUri) != 2)
+        if (pathIsFile(rootUri) == 3)
         {
             if (locations[in].index[0].empty())
             {
@@ -621,12 +588,34 @@ int  Servers::fillFromLocation(int &in, string &uri)
                 rootUri += ("/" + locations[in].index[0]);
             }
         }
-        if (!pathExists(rootUri))
+        // if (!pathExists(rootUri))
+        // {
+        //     // throw "Erorr in " + rootUri + ": no such file or directory";
+        //     cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
+        //     return 0;
+        // }
+    }
+    else
+    {
+        rootUri = uri;
+        rootUri.replace(0, locations[in].path[0].length(), locations[in].root[0]);
+        if (pathIsFile(rootUri) == 3)
         {
-            // throw "Erorr in " + rootUri + ": no such file or directory";
-            cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
-            return 0;
+            if (locations[in].index[0].empty())
+            {
+                rootUri += ("/" + index[0]);
+            }
+            else
+            {
+                rootUri += ("/" + locations[in].index[0]);
+            }
         }
+        // if (!pathExists(rootUri))
+        // {
+        //     // throw "Erorr in " + rootUri + ": no such file or directory";
+        //     cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
+        //     return 0;
+        // }
         
     }
     return 1;
@@ -651,7 +640,7 @@ void Servers::FillData(string uri)
             else 
                 rootUri = locations[def].root[0] + uri;
 
-            if (pathIsFile(rootUri) != 2)
+            if (pathIsFile(rootUri) == 3)
             {
                 LocationIndex = locations[def].index[0];
                 if (LocationIndex.empty())
@@ -660,30 +649,37 @@ void Servers::FillData(string uri)
                     rootUri += ("/" + LocationIndex);
             }
             UriLocation = locations[def];
-            if (!pathExists(rootUri))
-            {
-                // throw "Erorr in " + rootUri + ": no such file or directory";
-                cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
-                return;
-            }
+            // if (!pathExists(rootUri))
+            // {
+            //     // throw "Erorr in " + rootUri + ": no such file or directory";
+            //     cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
+            //     return;
+            // }
         }
         else
         {
-            rootUri = root[0] +uri;
+            rootUri = root[0] +uri +"/" + index[0];
+            UriLocation.path.push_back("");
+            UriLocation.root.push_back(root[0]);
+            UriLocation.allow_methods.push_back("");
+            UriLocation.autoindex = 0;
+            UriLocation.upload = 0;
+            UriLocation.index.push_back(index[0]);
         }
     }
     else
     {
         std::cout<<"Path of location :"<<locations[in].GetPath()<<endl;
-        if(fillFromLocation(in, uri))
-        {
+        // if()
+        // {
+            fillFromLocation(in, uri);
             UriLocation = locations[in];
             if (locations[in].GetPath() == "/cgi")
             {
                 Is_cgi = true;
             }
             
-        }
+        // }
     }
 }
 

@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:03 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/24 17:30:16 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/25 15:15:17 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,18 +43,6 @@ void Location::checkValidation()
             throw "Error : Invalid Derecties\n";
         }
     }
-}
-
-std::string Location::getCmdCgi(std::string & exta)
-{
-    for (size_t i = 0; i < cgi_path.size(); i++)
-    {
-        if (cgi_path[i][0]    == exta)
-        {
-            return cgi_path[i][1];
-        }
-    }
-    return "";
 }
 
 
@@ -121,9 +109,15 @@ void Location::desplayLocation()
     cout<<"PATH :"<<path[0]<<endl;
     cout<<"AllowMethods :"<<GetAllowMethods()<<endl;
     cout<<"Root :"<<GetRoot()<<endl;
-    Printtwodom(GetCgiPath(),"GetCgiPath");
+    map<string,string>::iterator iter = cgi_path.begin();
+    while (iter != cgi_path.end())
+    {
+        cout<<"cgi_path :'"<<iter->first<<"' '"<<iter->second<<"'\n";
+        iter++;
+    }
     std::cout<<"upload  :"<<GetUpload()<<std::endl;
-    std::cout<<"Autoindex  :"<<GetAutoindex()<<std::endl;
+    std::cout<<"autoindex  :"<<GetAutoindex()<<std::endl;
+    std::cout<<"index  :"<<GetindexLocation()<<std::endl;
 }
 void Location::SetAllDir()
 {
@@ -171,10 +165,7 @@ void Location::Printtwodom(const std::vector<std::vector<std::string> > & matrix
     } 
 }
 
-void Location::parce_location()
-{
-    
-}
+
 
 void Location::SetRoot()
 {
@@ -334,14 +325,6 @@ void Location::SetUpload()
 //     }
 // }
 
-std::vector<std::string>  Location::AddcgiPaths(std::string status,std::string path)
-{
-    std::vector<std::string> vErrorPage;
-    vErrorPage.push_back(status);
-    vErrorPage.push_back(path);
-
-    return vErrorPage;
-}
 
 void Location::SetCgiPath()
 {
@@ -362,7 +345,7 @@ void Location::SetCgiPath()
             {
                 throw ("Path '"+path+"' does not exist.\n");
             }
-            cgi_path.push_back(AddcgiPaths(extantion,path));
+            cgi_path[extantion] = path;
         }
     }
     
@@ -387,13 +370,14 @@ void Location::SetCgiPath()
 {
     return upload;
 }
- std::vector< std::vector<std::string> > & Location::GetCgiPath()
-{
-    return cgi_path;
-}
+
 std::string & Location::GetRoot()
 {
     return root[0];
+}
+std::string & Location::GetindexLocation()
+{
+    return index[0];
 }
 
 Location::Location()

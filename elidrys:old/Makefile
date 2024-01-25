@@ -1,9 +1,8 @@
 NAME = webser
 
-
 CXX = c++
 
-CPPFLAG = -Wall -Wextra -Werror -std=c++98
+CPPFLAG = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g3
 
 SRC_DIR = src
 

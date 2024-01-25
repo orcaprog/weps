@@ -23,17 +23,6 @@ void test(const string& file_name)
     in_file.close();
 
 }
- 
-struct integers{
-    integers(){
-        a = 4;
-        b = 5;
-        c = 6;
-    }
-    int a; 
-    int b;
-    int c; 
-};
 
 int main(){
     multiblex mlt;

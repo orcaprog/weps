@@ -1,35 +1,53 @@
-
 #include "Request.hpp"
 
 Request::Request()
 {
+    method = NULL;
     body_state = 0;
     body_size = 0;
-    root_path = "/nfs/homes/abouassi/Desktop/webserv";
-    method = NULL;
+    root_path = "/nfs/homes/aelidrys/Desktop/webserv/root_dir";
 }
 
 
-
 Request::Request(string& root_path1){
+    method = NULL;
     body_state = 0;
     body_size = 0;
     root_path = root_path1;
+}
+
+Request::Request(const Request& req1){
     method = NULL;
+    *this = req1;
+}
+
+Request& Request::operator=(const Request& oth){
+    if (this != &oth){
+        delete method;
+        method = oth.method;
+        body_state = oth.body_state;
+        body_size = oth.body_size;
+        type = oth.type;
+        r_path = oth.r_path;
+        root_path = oth.root_path;
+        req_path = oth.req_path;
+        http_v = oth.http_v;
+        body = oth.body;
+        headers = oth.headers;
+    }
+    return *this;
 }
 
 int Request::spl_reqh_body(string s1)
 {
     if (body_state){
         body = s1;
-        cout<<"----------"<< body<<"------------\n";
         body_size += body.size();
         return 0;
     }
     if (s1.find("\r\n\r\n", 0) != s1.npos)
     {
         body = s1.substr(s1.find("\r\n\r\n", 0) + 4);
-        cout<<"----------"<< body<<"------------\n";
         cout << "--_______Lheaders Te9raw Kolhom________--\n" << endl;
         req_h += s1.substr(0, s1.find("\r\n\r\n", 0));
         cout <<"#################\n"<< req_h <<"\n##############"<< endl;
@@ -59,12 +77,6 @@ int Request::parce_key(const string &key)
     return 1;
 }
 
-int Request::check_path(){
-    struct stat fileStat;
-    req_path = root_path + r_path;
-    return stat(req_path.c_str(), &fileStat) == 0;
-}
-
 int Request::parce_rline(const string &rline){
     stringstream ss;
     string tmp;
@@ -77,10 +89,7 @@ int Request::parce_rline(const string &rline){
     type = tmp;
     getline(ss, tmp, ' ');
     r_path = tmp;
-    if (!check_path()){
-        cout << "ERROE: Unkounu Path " << req_path << endl;
-        return 0;
-    }
+    req_path = root_path + r_path;
     getline(ss, tmp);
      if (tmp != "HTTP/1.1\r" && tmp != "HTTP/1.1"){
         cout << "ERROE: Unkounu Http Version " << tmp << endl;
@@ -131,21 +140,19 @@ void Request::parce_req(const string &req)
     getline(sstr,line);
     if (!parce_rline(line))
         return ;
-    method = create_method(type);
     while (sstr.peek() != -1)
     {
         getline(sstr, line);
         if (line.size() && !parce_line(line))
             break;
     }
+    method = create_method(type);
 }
 
-void    Request::process_req(const string &req){
-    cout << "----------- process_req Bdat ------------\n";
+void    Request::process_req(const string &req, size_t read_len, int event){
     parce_req(req);
-    if (body_state)
-        method->process(body, body_size);
-    cout << "------------ process_req Salat ------------\n";
+    if (body_state && method)
+        method->process(body, read_len, event);
 }
 
 
@@ -155,13 +162,8 @@ void Request::show_inf() const
     cout<<"Request line -> : "<<type<<" "<< r_path<<" "<< http_v<< endl;
     for (it = headers.begin(); it != headers.end(); it++)
         cout << "||" << it->first << " => " << it->second << "||" << endl;
-    cout << "\n$$$$  body_size = "<<body_size;
+    cout << "\n$$$$  body_size = "<<body_size<<" b_state: "<<body_state;
     cout <<" $$$$$\n ----<body>---- \n" << body << endl;
-}
-
-Request::Request(const Request& req1){
-    method = NULL;
-    *this = req1;
 }
 
 Method* Request::create_method(const string &type){
@@ -172,8 +174,6 @@ Method* Request::create_method(const string &type){
         // m = new Post();
     // if (type == "DELETE")
         // m = new Delete();
-    else
-        cerr << "Unkounu Method" << endl;
     if (m){
         m->headers = headers;
         m->http_v = http_v;
@@ -183,22 +183,10 @@ Method* Request::create_method(const string &type){
     return (m);
 }
 
-
-Request& Request::operator=(const Request& oth){
-    if (this != &oth){
-        delete method;
-        method = oth.method;
-        root_path = oth.root_path;
-        body_state = oth.body_state;
-        body_size = oth.body_size;
-        type = oth.type;
-        r_path = oth.r_path;
-        req_path = oth.req_path;
-        http_v = oth.http_v;
-        body = oth.body;
-        headers = oth.headers;
-    }
-    return *this;
+string Request::get_respons() const{
+    if (!method)
+        return("");
+    return (method->respons);
 }
 
 Request::~Request(){
