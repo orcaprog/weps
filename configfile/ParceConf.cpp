@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:54:31 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/24 18:55:33 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/26 11:02:48 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ std::vector<std::string> ParceConf::Split_line(std::string line)
     std::string chunks;
     while (std::getline(ss, chunks, ' '))
     {
-        if (!chunks.empty())
+        if (!chunks.empty() )
             vline.push_back(chunks);
     }
     return vline;
@@ -32,12 +32,14 @@ void ParceConf::TakeAndParce(std::string confgfile)
     std::ifstream configfile;
     std::string line;
     std::vector<std::string> _split;
+    std::vector<string>::iterator iterfind;
     configfile.open(confgfile.c_str(), std::ios::in);
     if (configfile.is_open())
     {
         while (getline(configfile, line))
         {
-            if (!line.empty())
+            
+            if (!line.empty() )
             {
                 _split = Split_line(line);
                 if (!_split.empty())
@@ -55,41 +57,7 @@ ParceConf::ParceConf()
 
 }
 
-// Servers ParceConf::FirstFill()
-// {
-//     Servers server;
-//     // int bracket = 0;
-//     if (Vconf[index][0] != "server" || Vconf[index].size() > 1)
-//     {
-//         throw "Error : no server derectires";
-//     }
-//     else
-//         server.servconf.push_back(Vconf[index]);
-//     index++;
 
-//     // if (index < Vconf.size()  && Vconf[index][0] != "{")
-//     // {
-//     //     throw "Error : no open brackets \n";
-//     // }
-//     // index++;
-//     // bracket++;
-
-//     while (index < Vconf.size() && Vconf[index][0] != "server")
-//     {
-//         // if (Vconf[index][0] == "{")
-//         //     bracket++;
-
-//         server.servconf.push_back(Vconf[index]);
-//         index++;
-//     }
-//     // std::cout<<"_______br______"<<bracket<<std::endl;
-//     // if (Vconf[index - 1][0] != "}")
-//     // {
-//     //     throw "Error : no open brackets \n";
-//     // }
-
-//     return server;
-// }
 
 Servers ParceConf::FirstFill()
 {

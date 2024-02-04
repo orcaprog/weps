@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 18:04:44 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/25 15:59:57 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/29 16:30:35 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,58 +52,20 @@ bool Multiplexing::checkvalidHeader(std::string str)
 
 void Multiplexing::Out_Events(int n)
 {
-    char cgiBuffer[1024];
-    std::string cgires("");
-    string globRusl;
+       
+    mClients[events[n].data.fd].second.process_req(string(""),0,EPOLLOUT);
 
-    if (mClients[events[n].data.fd].second.req_done())
+    string res = mClients[events[n].data.fd].second.get_respons();
+
+    write(events[n].data.fd , res.c_str(), res.size());
+    if (mClients[events[n].data.fd].second.method && mClients[events[n].data.fd].second.method->end)
     {
-        if (fd != -2)
-        {
-            int readb = 1;
-            bool check_cont;
-            while (readb != 0)
-            {
-                readb = read(fd,cgiBuffer,1024);
-                cout<<"read byts :"<<readb<<endl;
-                cout<<"fd  :"<<fd<<endl;
-                if (readb == 0)
-                    break;
-                std::cout<<"fd != -2   fd :"<<fd<<"\n";
-                if (readb == -1)
-                {
-                    perror("Erorr read in cgi\n");
-                    exit(1);
-                }
-                cgires.append(cgiBuffer,readb);
-            }
-            std::cout<<"enter here :"<<cgires<<endl;
-            check_cont = checkvalidHeader(cgires);
-            std::cout<<check_cont<<endl;
-            globRusl = "HTTP/1.1 200 OK\r\n" + chekIf(check_cont) + cgires;
-            write(events[n].data.fd,globRusl.c_str(),globRusl.length());
-            epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);
-            close(fd);
-            close(events[n].data.fd);
-            mClients.erase(events[n].data.fd);
-            fd = -2;
-        }
-        else
-        {
-            mClients[events[n].data.fd].second.process_req(string(""),0,EPOLLOUT);
-
-            string res = mClients[events[n].data.fd].second.get_respons();
-
-            write(events[n].data.fd , res.c_str(), res.size());
-            if (mClients[events[n].data.fd].second.method && mClients[events[n].data.fd].second.method->end)
-            {
-                epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);
-                close(events[n].data.fd);
-                mClients.erase(events[n].data.fd);
-                cout<<"close connections :"<<events[n].data.fd<<endl;
-            }
-        }
+        epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);
+        close(events[n].data.fd);
+        mClients.erase(events[n].data.fd);
+        cout<<"close connections :"<<events[n].data.fd<<endl;
     }
+    
 }
 
 void Multiplexing::In_Events(int n)
@@ -132,33 +94,8 @@ void Multiplexing::In_Events(int n)
         {
             
             mClients[events[n].data.fd].second.process_req(string("").append(buffer, bytesRead),bytesRead,EPOLLIN);
-            mClients[events[n].data.fd].first.FillData(mClients[events[n].data.fd].second.r_path);
-            cout<<"rootUri :"<<mClients[events[n].data.fd].first.rootUri<<endl;
-            cout<<"is_cgi :"<<mClients[events[n].data.fd].first.Is_cgi<<endl;
-
-            cout<<"      ========\n";
-            cout<<"        ===\n";
-            cout<<"         =\n";
-            mClients[events[n].data.fd].first.UriLocation.desplayLocation();
-            cout<<"         =\n";
-            cout<<"        ===\n";
-            cout<<"      ========\n";
-            
-            // if (mClients[events[n].data.fd].second.r_path == "/favicon.ico")
-            // {
-            //     epoll_ctl(epollfd,EPOLL_CTL_DEL,events[n].data.fd,&ev);
-            //     close(events[n].data.fd);
-            //     mClients.erase(events[n].data.fd);
-            //     cout<<"close connections :"<<events[n].data.fd<<endl;
-            // }
-            
-            // if (mClients[events[n].data.fd].second.r_path.find("/cgi") != std::string::npos)
-            // {
-            //     Cgi cgi(mClients[events[n].data.fd].second.r_path,mClients[events[n].data.fd].first.getLocation("/cgi"));
-            //     std::cout<<"enter here\n";
-            //     cgi.ExecCgi();
-            //     fd  = open("out.txt",O_RDONLY);
-            // }
+            string res = mClients[events[n].data.fd].second.get_respons();
+            write(events[n].data.fd , res.c_str(), res.size());
         }
     }
 }
@@ -216,7 +153,7 @@ void Multiplexing::CreatMUltiplex()
     // std::string httprespose = headers + data;
     // const char *hello = httprespose.c_str();
 
-    epollfd = epoll_create(255);
+    epollfd = epoll_create(1);
     if (epollfd == -1) {
         perror("epoll_create1");
         exit(EXIT_FAILURE);

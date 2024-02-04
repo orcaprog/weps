@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 14:49:58 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/08 16:48:07 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/02/01 09:26:30 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ class Delete
 {
 
 public:
-    Delete(std::string path);
+    Delete(std::string path,std::string rootPath);
 
     int  my_remove(std::string file);
     void RemoveAllPath(std::string path);

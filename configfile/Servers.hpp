@@ -6,12 +6,13 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:42:27 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/25 18:14:03 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/28 09:58:44 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVERS_HPP
 #define SERVERS_HPP
+#include <arpa/inet.h>
 
 #include <stdio.h>
 #include <sys/socket.h>
@@ -30,6 +31,9 @@
 #include <sys/stat.h>
 #include "Location.hpp"
 #include <stack>
+#include <dirent.h>
+#include <iostream>
+#include<cstring>
 
 class Servers
 {
@@ -40,7 +44,6 @@ private:
     std::vector<std::string>  AddErrorPage(std::string status,std::string path);
     int  checkDup(std::string der,int & index);
     bool check_isdigit(std::string str);
-    void FillStatus();
     void FillValid();
     void checkValidation();
     void parceIp(std::string ip);
@@ -62,7 +65,6 @@ private:
     void SetIndex(); // done ~
     
     void Printtwodom(const std::vector<std::vector<std::string> > & matrix,std::string data);
-    void ReplacePath(std::string status,std::string path);
 
 public:
 
@@ -101,15 +103,17 @@ public:
     void SetDefaultError();
     void CreatSocketServer();
     Servers();
-
+    void SetIndex_Of(string path);
     /*====================================*/
     int searchPathLocation(string & uri);
-    int fillFromLocation(int & index,string & uri);
-    void FillData(string  uri);
+    int fillFromLocation(int &in, string &uri,string & method);
+    void FillData(string uri,string mehtod);
     string rootUri;
     bool Is_cgi;
     void checkIsCgi(string uri);
     string querys;
+    string status;
+    void SetUriRoot(int i,string & uri);
     Location UriLocation;
     /*====================================*/
     void FillLocation();

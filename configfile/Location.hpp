@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:05 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/25 15:11:42 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/27 09:14:01 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,9 @@ public:
         std::vector<std::vector<std::string> > & GetCgiPath();
         std::string & GetRoot();
         std::string & GetindexLocation();
+        void SetIndexRoot(string root,string index);
+        string ServRoot;
+        string Servindex;
         
         std::vector<std::vector<std::string> > vlocation;
 

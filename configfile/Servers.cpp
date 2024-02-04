@@ -6,12 +6,17 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 17:43:44 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/25 20:13:35 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/30 14:43:35 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Servers.hpp"
-
+bool isValidIpAddress(string & ipAddress)
+{
+    struct sockaddr_in sa;
+    int result = inet_pton(AF_INET, ipAddress.c_str(), &(sa.sin_addr));
+    return result != 0;
+}
 int  Servers::getLocation(std::string path)
 {
     size_t i;
@@ -180,7 +185,11 @@ void Servers::SetHost()
         throw "invalid host in  directive \n";
     }
     arg = servconf[i][1];
-    parceIp(arg);
+    if(!isValidIpAddress(arg))
+    {
+        throw "invalid host ip address \n";
+    }
+    // parceIp(arg);
     host.push_back(arg);
 }
 void Servers::SetRoot()
@@ -251,21 +260,13 @@ void Servers::SetClient_max_body_size()
 
 void Servers::check_Status(std::string status)
 {
-    std::vector<std::string>::iterator iter;
+    std::map<string,string>::iterator iter;
 
-    iter = std::find(s_erorr.begin(), s_erorr.end(), status);
-    if (iter == s_erorr.end())
+    iter = error_page.find(status);
+    if (iter == error_page.end())
     {
         throw "Error : Invalid status '" + status + "' code  Derecties\n";
     }
-}
-std::vector<std::string> Servers::AddErrorPage(std::string status, std::string path)
-{
-    std::vector<std::string> vErrorPage;
-    vErrorPage.push_back(status);
-    vErrorPage.push_back(path);
-
-    return vErrorPage;
 }
 
 void Servers::SetError_page()
@@ -302,7 +303,6 @@ void Servers::SetAllDir()
 {
     // ParceServers();
     FillValid();
-    FillStatus();
     FillLocation();
     checkValidation();
 
@@ -317,6 +317,7 @@ void Servers::SetAllDir()
     size_t i = 0;
     while (i < locations.size())
     {
+        locations[i].SetIndexRoot(root[0],index[0]);
         locations[i].SetAllDir();
         i++;
     }
@@ -370,6 +371,10 @@ Location Servers::FirstFill(size_t &index)
     Location loaction;
     loaction.vlocation.push_back(servconf[index]);
     index++;
+    if(servconf[index][0] != "{" )
+    {
+        throw "no open bracket for location \n";
+    }
     while (index < servconf.size() && servconf[index][0] != "location")
     {
         // std::cout<<index<<"  :"<<servconf[index][0]<<std::endl;
@@ -395,49 +400,6 @@ void Servers::FillLocation()
 /*=======================================================================*/
 /*=======================================================================*/
 
-void Servers::FillStatus()
-{
-    s_erorr.push_back("400");
-    s_erorr.push_back("401");
-    s_erorr.push_back("402");
-    s_erorr.push_back("403");
-    s_erorr.push_back("404");
-    s_erorr.push_back("405");
-    s_erorr.push_back("406");
-    s_erorr.push_back("407");
-    s_erorr.push_back("408");
-    s_erorr.push_back("409");
-    s_erorr.push_back("410");
-    s_erorr.push_back("411");
-    s_erorr.push_back("412");
-    s_erorr.push_back("413");
-    s_erorr.push_back("414");
-    s_erorr.push_back("415");
-    s_erorr.push_back("416");
-    s_erorr.push_back("417");
-    s_erorr.push_back("418");
-    s_erorr.push_back("421");
-    s_erorr.push_back("422");
-    s_erorr.push_back("423");
-    s_erorr.push_back("424");
-    s_erorr.push_back("425");
-    s_erorr.push_back("426");
-    s_erorr.push_back("428");
-    s_erorr.push_back("429");
-    s_erorr.push_back("431");
-    s_erorr.push_back("451");
-    s_erorr.push_back("500");
-    s_erorr.push_back("501");
-    s_erorr.push_back("502");
-    s_erorr.push_back("503");
-    s_erorr.push_back("504");
-    s_erorr.push_back("505");
-    s_erorr.push_back("506");
-    s_erorr.push_back("507");
-    s_erorr.push_back("508");
-    s_erorr.push_back("510");
-    s_erorr.push_back("511");
-}
 void Servers::FillValid()
 {
     Vstrvalid.push_back("listen");
@@ -465,7 +427,8 @@ void Servers::checkValidation()
         iter = std::find(Vstrvalid.begin(), Vstrvalid.end(), servconf[i][0]);
         if (iter == Vstrvalid.end())
         {
-            throw "Error : Invalid Derecties\n";
+            
+            throw "Error : Invalid Derecties '"+servconf[i][0]+"'\n";
         }
     }
 }
@@ -518,7 +481,7 @@ void Servers::CreatSocketServer()
     }
 
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr(host[0].c_str()); //init_adder(host); 
     address.sin_port = htons(port[0]);
     memset(address.sin_zero, '\0', sizeof address.sin_zero);
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
@@ -533,6 +496,55 @@ void Servers::CreatSocketServer()
     }
 }
 /*#############################################################*/
+void Servers::SetIndex_Of(string path)
+{
+    std::ofstream index_Of;
+    std::string line;
+    std::vector<std::string> _split;
+    std::vector<string>::iterator iterfind;
+
+    
+    struct dirent *entry;
+    DIR *dir = opendir(path.c_str());
+    if (dir == NULL) {
+        perror("Error opening directory");
+        return ;
+    }
+
+    
+    index_Of.open("index_of.html", std::ios::out);
+    if (index_Of.is_open())
+    {
+        index_Of << "<html>" << endl;
+        index_Of << "<head>" << endl;
+        index_Of << "    <title>Index of /</title>" << endl;
+        index_Of << "</head>" << endl;
+        index_Of << "<body>" << endl;
+        index_Of << "    <h1>Index of /</h1>" << endl;
+        index_Of << "    <hr>" << endl;
+        index_Of << "    <pre>" << endl;
+
+        while ((entry = readdir(dir)) != NULL) 
+        {
+            if (std::strcmp(entry->d_name  , "."))
+            {
+                if (entry->d_type == DT_DIR)
+                {
+                    index_Of << "    <a href=\""+ string(entry->d_name) +"/\">"+ string(entry->d_name) +"/</a>" << endl;
+                }
+                else
+                    index_Of << "    <a href=\""+ string(entry->d_name) +"\">"+ string(entry->d_name) +"</a>" << endl;
+                
+            }
+            
+        }
+        index_Of << "    </pre>" << endl;
+        index_Of << "    <hr>" << endl;
+        index_Of << "</body>" << endl;
+        index_Of << "</html>" << endl;
+        index_Of.close();
+    }
+}
 void Servers::SetDefaultError()
 {
     error_page["400"] =  "../error_pages/400.html";
@@ -558,12 +570,66 @@ int Servers::searchPathLocation(string &uri)
     return -1;
 }
 
-int  Servers::fillFromLocation(int &in, string &uri)
+
+int  Servers::fillFromLocation(int &in, string &uri,string & method)
+{
+        rootUri = uri;
+        rootUri.replace(0, locations[in].path[0].length(), locations[in].root[0]);
+        if (pathIsFile(rootUri) == 3 && method == "GET")
+        {
+            rootUri += ("/" + locations[in].index[0]);
+            cout<<"from location :\n\n"<<rootUri<<endl<<endl;
+            if (!pathExists(rootUri))
+            {
+                if (locations[in].autoindex)
+                {
+                    SetIndex_Of(root[0]);
+                    rootUri = "index_of.html";
+                }
+                else
+                {
+                    rootUri = error_page["404"];
+                    status = "404";
+                }
+                return 0;
+            }        
+        }
+        else if (!pathExists(rootUri))
+        {
+            rootUri = error_page["404"];
+            status = "404";
+            return 0;
+        }
+    return 1;
+}
+void Servers::SetUriRoot(int i,string & uri)
+{
+    rootUri = locations[i].root[0] + uri;
+    if (pathIsFile(rootUri) == 3)
+    {
+        rootUri += ("/" + locations[i].index[0]);
+        if (!pathExists(rootUri))
+        {
+            if (locations[i].autoindex)
+            {
+                SetIndex_Of(root[0]);
+                rootUri = "index_of.html";
+            }
+            else
+            {
+                rootUri = error_page["404"];
+                status = "404";
+            }
+        }    
+    }
+}
+
+void Servers::FillData(string uri,string mehtod)
 {
     size_t pos;
-    pos = uri.find("?");
+    cout<<"URI :"<<uri<<endl;
     int len;
-    
+    pos = uri.find("?");
     if (pos != std::string::npos)
     {
         len = uri.length() - pos;
@@ -573,88 +639,25 @@ int  Servers::fillFromLocation(int &in, string &uri)
         querys = q;
         uri.erase(pos,len);
     }
-    if (locations[in].root[0].empty())
-    {
-        rootUri = uri;
-        rootUri.replace(0, locations[in].path[0].length(), root[0]);
-        if (pathIsFile(rootUri) == 3)
-        {
-            if (locations[in].index[0].empty())
-            {
-                rootUri += ("/" + index[0]);
-            }
-            else
-            {
-                rootUri += ("/" + locations[in].index[0]);
-            }
-        }
-        // if (!pathExists(rootUri))
-        // {
-        //     // throw "Erorr in " + rootUri + ": no such file or directory";
-        //     cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
-        //     return 0;
-        // }
-    }
-    else
-    {
-        rootUri = uri;
-        rootUri.replace(0, locations[in].path[0].length(), locations[in].root[0]);
-        if (pathIsFile(rootUri) == 3)
-        {
-            if (locations[in].index[0].empty())
-            {
-                rootUri += ("/" + index[0]);
-            }
-            else
-            {
-                rootUri += ("/" + locations[in].index[0]);
-            }
-        }
-        // if (!pathExists(rootUri))
-        // {
-        //     // throw "Erorr in " + rootUri + ": no such file or directory";
-        //     cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
-        //     return 0;
-        // }
-        
-    }
-    return 1;
-}
-
-void Servers::FillData(string uri)
-{
     int in = searchPathLocation(uri);
     Is_cgi = false;
     int def = 0;
-    string LocationIndex;
     if (in == -1)
     {
-
         def = getLocation("/");
         if (def != -1)
         {
-            if (locations[def].root[0].empty())
+            rootUri = locations[def].root[0] + uri;
+            if (pathIsFile(rootUri) == 3 && mehtod == "GET")
             {
-                rootUri = root[0] + uri;
+               SetUriRoot(def,uri);
             }
-            else 
-                rootUri = locations[def].root[0] + uri;
-
-            if (pathIsFile(rootUri) == 3)
+            else if (!pathExists(rootUri))
             {
-                LocationIndex = locations[def].index[0];
-                if (LocationIndex.empty())
-                    rootUri += ("/" + index[0]);
-                else
-                    rootUri += ("/" + LocationIndex);
+                rootUri = error_page["404"];
+                status = "404";
             }
             UriLocation = locations[def];
-            // if (!pathExists(rootUri))
-            // {
-            //     // throw "Erorr in " + rootUri + ": no such file or directory";
-            //     cout << "Erorr in " + rootUri + ": no such file or directory" << endl;
-            //     return;
-            // }
         }
         else
         {
@@ -670,23 +673,30 @@ void Servers::FillData(string uri)
     else
     {
         std::cout<<"Path of location :"<<locations[in].GetPath()<<endl;
-        // if()
-        // {
-            fillFromLocation(in, uri);
-            UriLocation = locations[in];
-            if (locations[in].GetPath() == "/cgi")
-            {
-                Is_cgi = true;
-            }
+        if (fillFromLocation(in, uri,mehtod) && locations[in].GetPath() == "/cgi")
+        {
+            Is_cgi = true;
+        }
+        UriLocation = locations[in];
             
-        // }
     }
+    cout<<"rootUri :"<<rootUri<<endl;
+    cout<<"is_cgi :"<<Is_cgi<<endl;
+    cout<<"querys :"<<querys<<endl;
+    cout<<"      ========\n";
+    cout<<"        ===\n";
+    cout<<"         =\n";
+    UriLocation.desplayLocation();
+    cout<<"         =\n";
+    cout<<"        ===\n";
+    cout<<"      ========\n";
 }
 
 Servers::Servers()
 {
     // root.push_back("");
     SetDefaultError();
+    status = "200";
 }
 
 Servers::~Servers()

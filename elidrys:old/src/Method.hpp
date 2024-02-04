@@ -14,6 +14,7 @@
 #include <sys/epoll.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include "../../configfile/ParceConf.hpp"
 using namespace std;
 
 #ifndef METHOD_HPP
@@ -25,7 +26,9 @@ public:
     string respons;
     int end;
 
-    string r_path;
+    Servers serv;
+    string uri;
+    string fullUri_path;
     string req_path;
     string http_v;
     map<string, string> headers;

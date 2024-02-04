@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/08 09:43:27 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/08 16:48:04 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/02/01 09:28:00 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@ int Delete::pathExists(std::string path) {
     return stat(path.c_str(), &fileStat) == 0;
 }
 
-Delete::Delete(std::string path)
+Delete::Delete(std::string path,std::string rootPath)
 {
-    if (!pathExists(path))
+    if (realpath(rootPath.c_str(),path.data()) == NULL)
     {
         throw "Delete Error: path not exist \n";
     }
@@ -44,6 +44,8 @@ void Delete::RemoveAllPath(std::string path)
 {
 
     int check_rm = 0;
+    // struct stat stat_info;
+    std::string path_plus;
     std::cout<<"path   :"<<path<<std::endl;
     DIR *dir = opendir(path.c_str());
     if (dir == NULL) {
@@ -57,7 +59,13 @@ void Delete::RemoveAllPath(std::string path)
 
             if (std::strcmp(entry->d_name  , ".") && std::strcmp(entry->d_name ,"..") )
             {
-                RemoveAllPath(path + "/"+entry->d_name);
+                path_plus = path + "/"+entry->d_name;
+                // stat(path_plus.c_str(),&stat_info);
+                // if (stat_info.st_mode & S_IWOTH)
+                // {
+                // }
+                
+                RemoveAllPath(path_plus);
                 std::cout<<"dir :"<<entry->d_name<<std::endl;
             }
         }

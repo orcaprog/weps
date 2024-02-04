@@ -6,7 +6,7 @@
 /*   By: abouassi <abouassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/28 18:23:03 by abouassi          #+#    #+#             */
-/*   Updated: 2024/01/25 15:15:17 by abouassi         ###   ########.fr       */
+/*   Updated: 2024/01/31 16:07:30 by abouassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void Location::checkValidation()
         iter = std::find(Vstrvalid.begin(),Vstrvalid.end(),vlocation[i][0]);
         if (iter == Vstrvalid.end())
         {
-            throw "Error : Invalid Derecties\n";
+            throw "Error : Invalid Derecties '"+vlocation[i][0]+"'\n";
         }
     }
 }
@@ -138,7 +138,7 @@ void Location::SetIndex()
     std::string arg;
     if (num == 0)
     {
-        index.push_back("");
+        index.push_back(Servindex);
         return;
     }
     if (vlocation[i].size() != 2)
@@ -165,7 +165,11 @@ void Location::Printtwodom(const std::vector<std::vector<std::string> > & matrix
     } 
 }
 
-
+ void Location::SetIndexRoot(string root,string index)
+ {
+    Servindex = index;
+    ServRoot = root;
+ }
 
 void Location::SetRoot()
 {
@@ -174,7 +178,7 @@ void Location::SetRoot()
     std::string arg;
     if (num == 0)
     {
-        root.push_back("");
+        root.push_back(ServRoot);
         return ;
     }
     if (vlocation[i].size() != 2 )
